@@ -1,0 +1,95 @@
+.events-page {
+  padding: 24px;
+  color: #fff;
+}
+
+.events-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.event-card {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #1a1a1a, #111);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.event-image img {
+  width: 140px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.event-info {
+  flex: 1;
+  margin-left: 16px;
+}
+
+.event-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.event-location,
+.event-date {
+  font-size: 13px;
+  color: #aaa;
+}
+
+.event-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.empty-state {
+  text-align: center;
+  margin-top: 50px;
+  color: #aaa;
+}
+
+/* DRAWER */
+.event-drawer {
+  width: 420px;
+  padding: 20px;
+  background: #0e0e0e;
+  color: #fff;
+}
+
+.drawer-title {
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.banner-box {
+  margin: 16px 0;
+}
+
+.file-input {
+  width: 100%;
+  margin-top: 8px;
+  color: #fff;
+}
+
+.drawer-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+.banner-preview {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
