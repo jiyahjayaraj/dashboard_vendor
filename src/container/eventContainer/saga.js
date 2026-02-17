@@ -6,51 +6,86 @@ import {
   getEventsRequest,
   getEventsSuccess,
   getEventsFailure,
+  updateEventRequest,
+  updateEventSuccess,
+  updateEventFailure
 } from "./slice";
-import commonApi from "../api"; // your API helper
 
-/* CREATE EVENT */
+import commonApi from "../api";
+
+/* =========================
+   CREATE EVENT
+========================= */
 function* createEventSaga(action) {
   try {
-    // Create new event
-    yield call(commonApi, {
+    const res = yield call(commonApi, {
       api: "http://localhost:5000/api/events",
       method: "POST",
-      body: action.payload,
-      
+      body: action.payload
     });
+
     yield put(createEventSuccess(res));
 
-    // REFRESH DATA: fetch events for the same vendor
-    yield put(getEventsRequest({ vendorId: action.payload.vendorId }));
+    // Refresh list
+    yield put(getEventsRequest({ vendorId: action.payload.get("vendorId") }));
+
   } catch (error) {
     yield put(createEventFailure(error.message));
   }
 }
 
-/* GET EVENTS */
+
+/* =========================
+   GET EVENTS
+========================= */
 function* getEventsSaga(action) {
   try {
-    const { vendorId } = action.payload; // must pass vendorId
+    const { vendorId } = action.payload;
 
     if (!vendorId) throw new Error("Vendor ID is required");
 
     const res = yield call(commonApi, {
-      api: `http://localhost:5000/api/events/${vendorId}`, // vendorId in URL
-      method: "GET",
-      authorization: null,
-      successAction: { type: getEventsSuccess.type },
-      failAction: { type: getEventsFailure.type },
+      api: `http://localhost:5000/api/events/${vendorId}`,
+      method: "GET"
     });
 
     yield put(getEventsSuccess(res));
+
   } catch (error) {
     yield put(getEventsFailure(error.message));
   }
 }
 
-/* WATCHER */
+
+/* =========================
+   UPDATE EVENT
+========================= */
+function* updateEventSaga(action) {
+  try {
+    const { id, data } = action.payload;
+
+    const res = yield call(commonApi, {
+      api: `http://localhost:5000/api/events/${id}`,
+      method: "PUT",
+      body: data
+    });
+
+    yield put(updateEventSuccess(res));
+
+    // Refresh list after update
+    yield put(getEventsRequest({ vendorId: data.get("vendorId") }));
+
+  } catch (error) {
+    yield put(updateEventFailure(error.message));
+  }
+}
+
+
+/* =========================
+   WATCHER
+========================= */
 export default function* eventActionWatcher() {
   yield takeLatest(createEventRequest.type, createEventSaga);
   yield takeLatest(getEventsRequest.type, getEventsSaga);
+  yield takeLatest(updateEventRequest.type, updateEventSaga);
 }

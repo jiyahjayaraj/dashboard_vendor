@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 
 import {
   createEventRequest,
-  getEventsRequest
+  getEventsRequest,
+  updateEventRequest
 } from "container/eventContainer/slice";
 
 import {
@@ -25,9 +26,14 @@ export default function Events() {
   const vendorId = user?._id;
 
   const [openDrawer, setOpenDrawer] = useState(false);
-  const [preview, setPreview] = useState(null);
+  const [viewOpen, setViewOpen] = useState(false);
+  const [ticketOpen, setTicketOpen] = useState(false);
 
-  console.log("events", events);
+  const [preview, setPreview] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
+  const [isEdit, setIsEdit] = useState(false);
+  const [editId, setEditId] = useState(null);
 
   const [form, setForm] = useState({
     eventName: "",
@@ -61,43 +67,77 @@ export default function Events() {
     setPreview(URL.createObjectURL(file));
   };
 
-  // ✅ UPDATED: Now sending FormData
+  const resetForm = () => {
+    setForm({
+      eventName: "",
+      description: "",
+      category: "",
+      city: "",
+      eventLocation: "",
+      eventDate: "",
+      startTime: "",
+      endTime: "",
+      price: "",
+      totalTickets: "",
+      earlyPrice: "",
+      earlyDeadline: "",
+      bannerImage: null
+    });
+    setPreview(null);
+    setIsEdit(false);
+    setEditId(null);
+  };
+
   const handleSubmit = () => {
     if (!form.eventName) return;
 
     const formData = new FormData();
 
-    formData.append("eventName", form.eventName);
-    formData.append("description", form.description);
-    formData.append("category", form.category);
-    formData.append("city", form.city);
-    formData.append("eventLocation", form.eventLocation);
-    formData.append("eventDate", form.eventDate);
-    formData.append("startTime", form.startTime);
-    formData.append("endTime", form.endTime);
-    formData.append("price", form.price);
-    formData.append("totalTickets", form.totalTickets);
-    formData.append("earlyPrice", form.earlyPrice);
-    formData.append("earlyDeadline", form.earlyDeadline);
+    Object.keys(form).forEach((key) => {
+      if (form[key] !== null && form[key] !== "") {
+        formData.append(key, form[key]);
+      }
+    });
+
     formData.append("vendorId", vendorId);
 
-    if (form.bannerImage) {
-      formData.append("bannerImage", form.bannerImage);
+    if (isEdit) {
+      dispatch(updateEventRequest({ id: editId, data: formData }));
+    } else {
+      dispatch(createEventRequest(formData));
     }
 
-    dispatch(createEventRequest(formData));
+    setTimeout(() => {
+      dispatch(getEventsRequest({ vendorId }));
+    }, 500);
 
     setOpenDrawer(false);
+    resetForm();
   };
 
   const BASE_URL = "http://localhost:5000";
+
+  const drawerStyle = {
+    PaperProps: {
+      sx: {
+        width: "70%",
+        maxWidth: "1000px"
+      }
+    }
+  };
 
   return (
     <Box className="events-page">
 
       <Box className="events-header">
         <Typography variant="h4">Events</Typography>
-        <Button variant="contained" onClick={() => setOpenDrawer(true)}>
+        <Button
+          variant="contained"
+          onClick={() => {
+            resetForm();
+            setOpenDrawer(true);
+          }}
+        >
           Create Event
         </Button>
       </Box>
@@ -139,9 +179,44 @@ export default function Events() {
               </Box>
 
               <Box className="event-actions">
-                <Button size="small">View</Button>
-                <Button size="small">Edit</Button>
-                <Button size="small" variant="outlined">
+                <Button
+                  size="small"
+                  onClick={() => {
+                    setSelectedEvent(e);
+                    setViewOpen(true);
+                  }}
+                >
+                  View
+                </Button>
+
+                <Button
+                  size="small"
+                  onClick={() => {
+                    setForm({
+                      ...e,
+                      bannerImage: null
+                    });
+                    setPreview(
+                      e.bannerImage
+                        ? `${BASE_URL}${e.bannerImage}`
+                        : null
+                    );
+                    setEditId(e._id);
+                    setIsEdit(true);
+                    setOpenDrawer(true);
+                  }}
+                >
+                  Edit
+                </Button>
+
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={() => {
+                    setSelectedEvent(e);
+                    setTicketOpen(true);
+                  }}
+                >
                   Manage Tickets
                 </Button>
               </Box>
@@ -151,121 +226,261 @@ export default function Events() {
         </Box>
       )}
 
-      <Drawer
-        anchor="right"
-        open={openDrawer}
-        onClose={() => setOpenDrawer(false)}
-      >
-        <Box className="event-drawer">
+      {/* CREATE / EDIT DRAWER */}
+<Drawer
+  anchor="right"
+  open={openDrawer}
+  onClose={() => setOpenDrawer(false)}
+  {...drawerStyle}
+>
+  <Box className="event-drawer">
 
-          <Typography className="drawer-title">
-            Create Event
-          </Typography>
+    <Typography className="drawer-title">
+      {isEdit ? "Update Event" : "Create Event"}
+    </Typography>
 
+    {/* ================= BASIC INFO ================= */}
+    <div className="drawer-card">
+      <Typography className="section-heading">
+        Basic Information
+      </Typography>
+
+      <TextField
+        fullWidth
+        name="eventName"
+        label="Event Title *"
+        value={form.eventName}
+        onChange={handleChange}
+      />
+
+      <TextField
+        fullWidth
+        multiline
+        rows={4}
+        name="description"
+        label="Event Description *"
+        value={form.description}
+        onChange={handleChange}
+        sx={{ mt: 2 }}
+      />
+
+      <TextField
+        fullWidth
+        name="category"
+        label="Category *"
+        value={form.category}
+        onChange={handleChange}
+        sx={{ mt: 2 }}
+      />
+    </div>
+
+    {/* ================= EVENT BANNER ================= */}
+    <div className="drawer-card">
+      <Typography className="section-heading">
+        Event Banner
+      </Typography>
+      <Typography className="section-sub">
+        Upload an attractive banner image for your event
+      </Typography>
+
+      <div className="upload-box">
+        <input type="file" accept="image/*" onChange={handleFileChange} />
+        {preview && (
+          <img src={preview} alt="preview" className="preview-img" />
+        )}
+      </div>
+    </div>
+
+    {/* ================= LOCATION ================= */}
+    <div className="drawer-card">
+      <Typography className="section-heading">
+        Location & Venue
+      </Typography>
+      <Typography className="section-sub">
+        Where will your event take place?
+      </Typography>
+
+      <Grid container spacing={2} sx={{ mt: 1 }}>
+        <Grid item xs={6}>
           <TextField
             fullWidth
-            name="eventName"
-            placeholder="Event Title"
-            value={form.eventName}
+            name="city"
+            label="City / Location *"
+            value={form.city}
             onChange={handleChange}
           />
-
+        </Grid>
+        <Grid item xs={6}>
           <TextField
             fullWidth
-            multiline
-            rows={3}
-            name="description"
-            placeholder="Event Description"
-            value={form.description}
+            name="eventLocation"
+            label="Venue Name *"
+            value={form.eventLocation}
             onChange={handleChange}
           />
+        </Grid>
+      </Grid>
+    </div>
 
-          <Box className="banner-box">
-            <Typography>Event Banner</Typography>
+    {/* ================= DATE & TIME ================= */}
+    <div className="drawer-card">
+      <Typography className="section-heading">
+        Date & Time
+      </Typography>
+      <Typography className="section-sub">
+        When will your event take place?
+      </Typography>
 
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
+      <Grid container spacing={2} sx={{ mt: 1 }}>
+        <Grid item xs={4}>
+          <TextField
+            fullWidth
+            type="date"
+            name="eventDate"
+            label="Event Date *"
+            InputLabelProps={{ shrink: true }}
+            value={form.eventDate}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <TextField
+            fullWidth
+            type="time"
+            name="startTime"
+            label="Start Time *"
+            InputLabelProps={{ shrink: true }}
+            value={form.startTime}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <TextField
+            fullWidth
+            type="time"
+            name="endTime"
+            label="End Time *"
+            InputLabelProps={{ shrink: true }}
+            value={form.endTime}
+            onChange={handleChange}
+          />
+        </Grid>
+      </Grid>
+    </div>
+
+    {/* ================= TICKETING ================= */}
+    <div className="drawer-card">
+      <Typography className="section-heading">
+        Ticketing & Pricing
+      </Typography>
+      <Typography className="section-sub">
+        Set up your ticket inventory and pricing
+      </Typography>
+
+      <Grid container spacing={2} sx={{ mt: 1 }}>
+        <Grid item xs={6}>
+          <TextField
+            fullWidth
+            type="number"
+            name="price"
+            label="Ticket Price (₹) *"
+            value={form.price}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            fullWidth
+            type="number"
+            name="totalTickets"
+            label="Total Tickets Available *"
+            value={form.totalTickets}
+            onChange={handleChange}
+          />
+        </Grid>
+      </Grid>
+
+      <Typography className="sub-heading">
+        Early Bird Discount (Optional)
+      </Typography>
+
+      <Grid container spacing={2} sx={{ mt: 1 }}>
+        <Grid item xs={6}>
+          <TextField
+            fullWidth
+            type="number"
+            name="earlyPrice"
+            label="Early Bird Price (₹)"
+            value={form.earlyPrice}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            fullWidth
+            type="date"
+            name="earlyDeadline"
+            label="Early Bird Deadline"
+            InputLabelProps={{ shrink: true }}
+            value={form.earlyDeadline}
+            onChange={handleChange}
+          />
+        </Grid>
+      </Grid>
+    </div>
+
+    {/* ================= ACTIONS ================= */}
+    <Box className="drawer-actions">
+      <Button variant="outlined" className="draft-btn">
+        Save as Draft
+      </Button>
+      <Button variant="contained" onClick={handleSubmit}>
+        {isEdit ? "Update Event" : "Create Event"}
+      </Button>
+    </Box>
+
+  </Box>
+</Drawer>
+
+
+      {/* VIEW DRAWER */}
+      <Drawer anchor="right" open={viewOpen} onClose={() => setViewOpen(false)} {...drawerStyle}>
+        {selectedEvent && (
+          <Box className="event-drawer">
+            <Typography className="drawer-title">Event Details</Typography>
+            <img
+              src={selectedEvent.bannerImage ? `${BASE_URL}${selectedEvent.bannerImage}` : "/placeholder.jpg"}
+              alt="banner"
+              className="view-banner"
             />
 
-            {preview && (
-              <img
-                src={preview}
-                alt="event"
-                style={{
-                  width: "100%",
-                  height: "180px",
-                  objectFit: "cover",
-                  borderRadius: "10px",
-                  marginTop: "8px"
-                }}
-              />
-            )}
+            <div className="view-section"><div className="view-label">Event Name</div><div className="view-value">{selectedEvent.eventName}</div></div>
+            <div className="view-section"><div className="view-label">Description</div><div className="view-value">{selectedEvent.description}</div></div>
+            <div className="view-section"><div className="view-label">Location</div><div className="view-value">{selectedEvent.city} - {selectedEvent.eventLocation}</div></div>
+            <div className="view-section"><div className="view-label">Date</div><div className="view-value">{new Date(selectedEvent.eventDate).toDateString()}</div></div>
+            <div className="view-section"><div className="view-label">Time</div><div className="view-value">{selectedEvent.startTime} - {selectedEvent.endTime}</div></div>
+            <div className="view-section"><div className="view-label">Ticket Price</div><div className="view-value">₹{selectedEvent.price}</div></div>
+            <div className="view-section"><div className="view-label">Total Tickets</div><div className="view-value">{selectedEvent.totalTickets}</div></div>
+            <div className="view-section"><div className="view-label">Early Bird Price</div><div className="view-value">₹{selectedEvent.earlyPrice}</div></div>
+            <div className="view-section"><div className="view-label">Early Deadline</div><div className="view-value">{selectedEvent.earlyDeadline}</div></div>
           </Box>
-
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                name="city"
-                placeholder="City"
-                value={form.city}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                name="eventLocation"
-                placeholder="Venue Name"
-                value={form.eventLocation}
-                onChange={handleChange}
-              />
-            </Grid>
-          </Grid>
-
-          <Grid container spacing={2}>
-            <Grid item xs={4}>
-              <TextField
-                fullWidth
-                type="date"
-                name="eventDate"
-                value={form.eventDate}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <TextField
-                fullWidth
-                type="time"
-                name="startTime"
-                value={form.startTime}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <TextField
-                fullWidth
-                type="time"
-                name="endTime"
-                value={form.endTime}
-                onChange={handleChange}
-              />
-            </Grid>
-          </Grid>
-
-          <Box className="drawer-actions">
-            <Button onClick={() => setOpenDrawer(false)}>
-              Save as Draft
-            </Button>
-            <Button variant="contained" onClick={handleSubmit}>
-              Create Event
-            </Button>
-          </Box>
-
-        </Box>
+        )}
       </Drawer>
+
+      {/* MANAGE TICKETS DRAWER */}
+      <Drawer anchor="right" open={ticketOpen} onClose={() => setTicketOpen(false)} {...drawerStyle}>
+        {selectedEvent && (
+          <Box className="event-drawer">
+            <Typography className="drawer-title">Ticket Management</Typography>
+
+            <div className="ticket-card"><div className="ticket-title">Total Tickets</div><div className="ticket-value">{selectedEvent.totalTickets || 0}</div></div>
+            <div className="ticket-card"><div className="ticket-title">Sold Tickets</div><div className="ticket-value">{selectedEvent.soldTickets || 0}</div></div>
+            <div className="ticket-card"><div className="ticket-title">Remaining Tickets</div><div className="ticket-value">{(selectedEvent.totalTickets || 0) - (selectedEvent.soldTickets || 0)}</div></div>
+            <div className="ticket-card"><div className="ticket-title">Revenue Generated</div><div className="ticket-value">₹{(selectedEvent.soldTickets || 0) * (selectedEvent.price || 0)}</div></div>
+          </Box>
+        )}
+      </Drawer>
+
     </Box>
   );
 }
