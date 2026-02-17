@@ -17,10 +17,53 @@ import {
 import { Add, Edit } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import CreateTicketDrawer from "./CreateTicketDrawer";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { getTicketsRequest } from "../../container/ticketcontainer/slice";
+
 
 const TicketManagement = () => {
+  const [search, setSearch] = useState("");
   const { tickets, loading } = useSelector((state) => state.ticket);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const dispatch = useDispatch();
+  const [selectedTicket, setSelectedTicket] = useState(null);
+
+
+  useEffect(() => {
+    const eventId = localStorage.getItem("eventId");
+
+    if (!eventId) {
+      console.log("No eventId found");
+      return;
+    }
+
+    dispatch(getTicketsRequest({ eventId }));
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!drawerOpen) {
+      const eventId = localStorage.getItem("eventId");
+      if (eventId) {
+        dispatch(getTicketsRequest({ eventId }));
+      }
+    }
+  }, [drawerOpen, dispatch]);
+
+
+  const handleEdit = (ticket) => {
+    setSelectedTicket(ticket);
+    setDrawerOpen(true);
+  };
+  const handleCreate = () => {
+  setSelectedTicket(null);
+  setDrawerOpen(true);
+};
+
+  const filteredTickets = tickets?.filter((ticket) =>
+    ticket.name.toLowerCase().includes(search.toLowerCase())
+  );
+
 
   return (
     <Box sx={{ p: 4, backgroundColor: "#0b0f14", minHeight: "100vh" }}>
@@ -31,7 +74,7 @@ const TicketManagement = () => {
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
         <Button
           startIcon={<Add />}
-          onClick={() => setDrawerOpen(true)}
+          onClick={handleCreate}
           sx={{
             background: "linear-gradient(90deg, #ff7a18, #ff9f1c)",
             color: "#fff",
@@ -43,12 +86,15 @@ const TicketManagement = () => {
         <TextField
           size="small"
           placeholder="Search..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           sx={{
             input: { color: "#fff" },
             backgroundColor: "#121821",
             borderRadius: 1,
           }}
         />
+
       </Box>
 
       {loading ? (
@@ -76,7 +122,7 @@ const TicketManagement = () => {
             </TableHead>
 
             <TableBody>
-              {tickets?.map((ticket) => (
+              {filteredTickets?.map((ticket) => (
                 <TableRow key={ticket._id}>
                   <TableCell sx={{ color: "#fff" }}>
                     {ticket.name}
@@ -110,9 +156,14 @@ const TicketManagement = () => {
                     />
                   </TableCell>
                   <TableCell>
-                    <Button startIcon={<Edit />} size="small">
+                    <Button
+                      startIcon={<Edit />}
+                      size="small"
+                      onClick={() => handleEdit(ticket)}
+                    >
                       Edit
                     </Button>
+
                   </TableCell>
                 </TableRow>
               ))}
@@ -123,8 +174,14 @@ const TicketManagement = () => {
 
       <CreateTicketDrawer
         open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        onClose={() => {
+          setDrawerOpen(false);
+          setSelectedTicket(null);
+        }}
+        ticketData={selectedTicket}
       />
+
+
     </Box>
   );
 };

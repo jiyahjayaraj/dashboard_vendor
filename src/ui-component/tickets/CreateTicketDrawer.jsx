@@ -8,15 +8,37 @@ import {
     MenuItem,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { createTicketRequest } from "../../container/ticketcontainer/slice";
+import { createTicketRequest, updateTicketRequest, getTicketsRequest } from "../../container/ticketcontainer/slice";
 import { getEventsRequest } from "../../container/eventContainer/slice";
 
-const CreateTicketDrawer = ({ open, onClose }) => {
+const CreateTicketDrawer = ({ open, onClose, ticketData }) => {
+    console.log("🔥 CreateTicketDrawer rendered");
     const dispatch = useDispatch();
+    const eventState = useSelector((state) => state.event);
+
+    useEffect(() => {
+        console.log("🧠 event redux state:", eventState);
+    }, [eventState]);
+
+    useEffect(() => {
+        console.log("EDIT ticketData:", ticketData);
+    }, [ticketData]);
 
     // ✅ Get events from redux
-    const { events } = useSelector((state) => state.event);
-    const vendorId = useSelector((state) => state.login.data?._id);
+    const rawEvents = useSelector((state) => state.event.events);
+
+
+    const events = Array.isArray(rawEvents)
+        ? rawEvents
+        : rawEvents?.events ||
+        rawEvents?.data?.events ||
+        [];
+
+    console.log("events array:", events);
+    console.log("first event:", events?.[0]);
+
+
+    const vendorId = useSelector((state) => state.login.userData?._id);
 
     const [form, setForm] = useState({
         eventId: "",      // ✅ added
@@ -25,6 +47,35 @@ const CreateTicketDrawer = ({ open, onClose }) => {
         totalQuantity: "",
         status: "ACTIVE",
     });
+    useEffect(() => {
+        if (ticketData) {
+            setForm({
+                eventId: ticketData.eventId?._id || ticketData.eventId || "",
+                name: ticketData.name || "",
+                price: ticketData.price || "",
+                totalQuantity: ticketData.totalQuantity || "",
+                status: ticketData.status || "ACTIVE",
+            });
+        }
+    }, [ticketData]);
+    useEffect(() => {
+        if (!open) {
+            setForm({
+                eventId: "",
+                name: "",
+                price: "",
+                totalQuantity: "",
+                status: "ACTIVE",
+            });
+        }
+    }, [open]);
+
+
+    useEffect(() => {
+        console.log("vendorId:", vendorId);
+        console.log("Drawer open:", open);
+    }, [vendorId, open]);
+
 
     // ✅ Fetch vendor events when drawer opens
     useEffect(() => {
@@ -33,20 +84,38 @@ const CreateTicketDrawer = ({ open, onClose }) => {
         }
     }, [dispatch, open, vendorId]);
 
+
     const handleChange = (e) => {
+        console.log("changing:", e.target.name, e.target.value);
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = () => {
-        dispatch(
-            createTicketRequest({
-                ...form,
-                price: Number(form.price),
-                totalQuantity: Number(form.totalQuantity),
-            })
-        );
+        if (!form.eventId) {
+            alert("Please select an event");
+            return;
+        }
 
-        onClose();
+        const payload = {
+            ...form,
+            price: Number(form.price),
+            totalQuantity: Number(form.totalQuantity),
+        };
+
+        if (ticketData) {
+            // ✅ UPDATE
+            dispatch(
+                updateTicketRequest({
+                    ticketTypeId: ticketData._id,
+                    data: payload,
+                    eventId: payload.eventId,
+                })
+            );
+
+        } else {
+            // ✅ CREATE
+            dispatch(createTicketRequest(payload));
+        }
 
         setForm({
             eventId: "",
@@ -55,6 +124,9 @@ const CreateTicketDrawer = ({ open, onClose }) => {
             totalQuantity: "",
             status: "ACTIVE",
         });
+        console.log("ticketData at submit:", ticketData);
+        console.log("ticketData._id:", ticketData?._id);
+        onClose();
     };
 
     return (
@@ -64,13 +136,10 @@ const CreateTicketDrawer = ({ open, onClose }) => {
             onClose={onClose}
             variant="temporary"
             ModalProps={{ keepMounted: true }}
-            sx={{
-                zIndex: (theme) => theme.zIndex.modal + 1,
-            }}
         >
             <Box sx={{ width: 380, p: 3 }}>
                 <Typography variant="h6" mb={2}>
-                    Create Ticket Type
+                    {ticketData ? "Edit Ticket Type" : "Create Ticket Type"}
                 </Typography>
 
                 {/* ✅ EVENT DROPDOWN */}
@@ -83,12 +152,18 @@ const CreateTicketDrawer = ({ open, onClose }) => {
                     onChange={handleChange}
                     margin="normal"
                 >
-                    {events?.map((event) => (
-                        <MenuItem key={event._id} value={event._id}>
-                            {event.title}
-                        </MenuItem>
-                    ))}
+                    {events.length > 0 ? (
+                        events.map((event) => (
+                            <MenuItem key={event._id} value={event._id}>
+                                {event.eventName}
+                            </MenuItem>
+
+                        ))
+                    ) : (
+                        <MenuItem disabled>No events found</MenuItem>
+                    )}
                 </TextField>
+
 
                 <TextField
                     fullWidth

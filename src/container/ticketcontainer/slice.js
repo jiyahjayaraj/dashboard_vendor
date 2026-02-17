@@ -5,8 +5,10 @@ const ticketSlice = createSlice({
   initialState: {
     loading: false,
     error: null,
-    tickets: [], // ticket types for an event
+    tickets: [],
+    eventId: null,   // ✅ add this
   },
+
   reducers: {
     /* CREATE TICKET TYPE */
     createTicketRequest: (state) => {

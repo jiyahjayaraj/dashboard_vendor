@@ -34,27 +34,42 @@ const MainRoutes = {
       path: 'dashboard',
       element: (
         <Suspense fallback={<Loader />}>
-
           <DashboardDefault />
         </Suspense>
       )
     },
     {
-      path: '/events',
-      element: <Events />
+      path: 'events',
+      element: (
+        <Suspense fallback={<Loader />}>
+          <Events />
+        </Suspense>
+      )
 
     },
     {
-      path: '/tickets',
-      element: <TicketManagement />
+      path: 'tickets',
+      element: (
+        <Suspense fallback={<Loader />}>
+          <TicketManagement />
+        </Suspense>
+      )
     },
     {
-      path: '/bookings',
-      element: <Bookings />
+      path: 'bookings',
+      element: (
+        <Suspense fallback={<Loader />}>
+          <Bookings />
+        </Suspense>
+      )
     },
     {
-      path: '/profile',
-      element: <Profile />
+      path: 'profile',
+      element: (
+        <Suspense fallback={<Loader />}>
+          <Profile />
+        </Suspense>
+      )
     },
     {
       path: 'userfeedback',

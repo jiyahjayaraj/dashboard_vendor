@@ -22,10 +22,8 @@ function* createTicketSaga(action) {
     yield call(commonApi, {
       api: `${appConfig.ip}/api/tickets/create`,
       method: "POST",
-      body: JSON.stringify(action.payload),
+      body: action.payload, 
       authorization: null,
-      successAction: { type: createTicketSuccess.type },
-      failAction: { type: createTicketFailure.type },
     });
 
     // REFRESH DATA: fetch tickets for the same event
@@ -41,17 +39,18 @@ function* getTicketsSaga(action) {
     const { eventId } = action.payload;
     if (!eventId) throw new Error("Event ID is required");
 
-    yield call(commonApi, {
+    const res = yield call(commonApi, {
       api: `${appConfig.ip}/api/tickets/event/${eventId}`,
       method: "GET",
       authorization: null,
-      successAction: { type: getTicketsSuccess.type },
-      failAction: { type: getTicketsFailure.type },
     });
+
+    yield put(getTicketsSuccess(res));
   } catch (error) {
     yield put(getTicketsFailure(error.message));
   }
 }
+
 
 /* UPDATE TICKET TYPE */
 function* updateTicketSaga(action) {
@@ -61,20 +60,19 @@ function* updateTicketSaga(action) {
     yield call(commonApi, {
       api: `${appConfig.ip}/api/tickets/${ticketTypeId}`,
       method: "PUT",
-      body: JSON.stringify(data),
+      body: data, // ✅ DO NOT stringify
       authorization: null,
-      successAction: { type: updateTicketSuccess.type },
-      failAction: { type: updateTicketFailure.type },
     });
 
-    // refresh list
     if (eventId) {
       yield put(getTicketsRequest({ eventId }));
     }
+
   } catch (error) {
     yield put(updateTicketFailure(error.message));
   }
 }
+
 
 /* UPDATE TICKET STATUS */
 function* updateTicketStatusSaga(action) {
