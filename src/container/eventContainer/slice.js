@@ -39,6 +39,16 @@ const eventSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+    updateEventRequest: (state) => {
+  state.loading = true;
+},
+updateEventSuccess: (state, action) => {
+  state.loading = false;
+},
+updateEventFailure: (state) => {
+  state.loading = false;
+},
+
   },
 });
 
@@ -49,6 +59,9 @@ export const {
   getEventsRequest,
   getEventsSuccess,
   getEventsFailure,
+  updateEventRequest,
+  updateEventSuccess,
+  updateEventFailure
 } = eventSlice.actions;
 
 export default eventSlice.reducer;
