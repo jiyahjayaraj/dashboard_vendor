@@ -34,9 +34,6 @@ const CreateTicketDrawer = ({ open, onClose, ticketData }) => {
         rawEvents?.data?.events ||
         [];
 
-    console.log("events array:", events);
-    console.log("first event:", events?.[0]);
-
 
     const vendorId = useSelector((state) => state.login.userData?._id);
 

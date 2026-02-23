@@ -1,4 +1,5 @@
 import React from "react";
+import { useSelector, useDispatch } from 'react-redux';
 import {
   Box,
   Button,
@@ -10,6 +11,15 @@ import {
 } from "@mui/material";
 
 const Profile = () => {
+  const vendor = useSelector((state) => state?.login?.userData || []);
+
+  const name = vendor?.vendorName 
+  const email = vendor?.vendorEmail
+  const phone = vendor?.[0]?.phone || 'N/A';
+  const role = vendor?.[0]?.role || 'N/A';
+  const status = vendor?.[0]?.status || 'N/A';
+  const district = vendor?.[0]?.district || 'N/A';
+  const userType = vendor?.[0]?.userType || 'N/A';
   return (
     <Box sx={{ p: 4, backgroundColor: "#0b0f14", minHeight: "100vh" }}>
       {/* Header */}
@@ -58,19 +68,19 @@ const Profile = () => {
             <TextField
               fullWidth
               label="Full Name"
-              defaultValue="Abhi"
+              defaultValue={name}
               margin="dense"
             />
             <TextField
               fullWidth
               label="Email Address"
-              defaultValue="abhi@eventora.com"
+              defaultValue={email}
               margin="dense"
             />
             <TextField
               fullWidth
               label="Phone Number"
-              defaultValue="+91 123 456 7890"
+              defaultValue={phone}
               margin="dense"
             />
 

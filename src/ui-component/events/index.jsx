@@ -209,16 +209,7 @@ export default function Events() {
                   Edit
                 </Button>
 
-                <Button
-                  size="small"
-                  variant="outlined"
-                  onClick={() => {
-                    setSelectedEvent(e);
-                    setTicketOpen(true);
-                  }}
-                >
-                  Manage Tickets
-                </Button>
+             
               </Box>
 
             </Box>
@@ -369,65 +360,7 @@ export default function Events() {
     </div>
 
     {/* ================= TICKETING ================= */}
-    <div className="drawer-card">
-      <Typography className="section-heading">
-        Ticketing & Pricing
-      </Typography>
-      <Typography className="section-sub">
-        Set up your ticket inventory and pricing
-      </Typography>
-
-      <Grid container spacing={2} sx={{ mt: 1 }}>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            type="number"
-            name="price"
-            label="Ticket Price (₹) *"
-            value={form.price}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            type="number"
-            name="totalTickets"
-            label="Total Tickets Available *"
-            value={form.totalTickets}
-            onChange={handleChange}
-          />
-        </Grid>
-      </Grid>
-
-      <Typography className="sub-heading">
-        Early Bird Discount (Optional)
-      </Typography>
-
-      <Grid container spacing={2} sx={{ mt: 1 }}>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            type="number"
-            name="earlyPrice"
-            label="Early Bird Price (₹)"
-            value={form.earlyPrice}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            type="date"
-            name="earlyDeadline"
-            label="Early Bird Deadline"
-            InputLabelProps={{ shrink: true }}
-            value={form.earlyDeadline}
-            onChange={handleChange}
-          />
-        </Grid>
-      </Grid>
-    </div>
+    
 
     {/* ================= ACTIONS ================= */}
     <Box className="drawer-actions">
@@ -459,27 +392,12 @@ export default function Events() {
             <div className="view-section"><div className="view-label">Location</div><div className="view-value">{selectedEvent.city} - {selectedEvent.eventLocation}</div></div>
             <div className="view-section"><div className="view-label">Date</div><div className="view-value">{new Date(selectedEvent.eventDate).toDateString()}</div></div>
             <div className="view-section"><div className="view-label">Time</div><div className="view-value">{selectedEvent.startTime} - {selectedEvent.endTime}</div></div>
-            <div className="view-section"><div className="view-label">Ticket Price</div><div className="view-value">₹{selectedEvent.price}</div></div>
-            <div className="view-section"><div className="view-label">Total Tickets</div><div className="view-value">{selectedEvent.totalTickets}</div></div>
-            <div className="view-section"><div className="view-label">Early Bird Price</div><div className="view-value">₹{selectedEvent.earlyPrice}</div></div>
-            <div className="view-section"><div className="view-label">Early Deadline</div><div className="view-value">{selectedEvent.earlyDeadline}</div></div>
           </Box>
         )}
       </Drawer>
 
       {/* MANAGE TICKETS DRAWER */}
-      <Drawer anchor="right" open={ticketOpen} onClose={() => setTicketOpen(false)} {...drawerStyle}>
-        {selectedEvent && (
-          <Box className="event-drawer">
-            <Typography className="drawer-title">Ticket Management</Typography>
-
-            <div className="ticket-card"><div className="ticket-title">Total Tickets</div><div className="ticket-value">{selectedEvent.totalTickets || 0}</div></div>
-            <div className="ticket-card"><div className="ticket-title">Sold Tickets</div><div className="ticket-value">{selectedEvent.soldTickets || 0}</div></div>
-            <div className="ticket-card"><div className="ticket-title">Remaining Tickets</div><div className="ticket-value">{(selectedEvent.totalTickets || 0) - (selectedEvent.soldTickets || 0)}</div></div>
-            <div className="ticket-card"><div className="ticket-title">Revenue Generated</div><div className="ticket-value">₹{(selectedEvent.soldTickets || 0) * (selectedEvent.price || 0)}</div></div>
-          </Box>
-        )}
-      </Drawer>
+      
 
     </Box>
   );

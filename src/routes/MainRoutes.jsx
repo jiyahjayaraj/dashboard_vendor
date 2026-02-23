@@ -11,7 +11,8 @@ const Events = lazy(() => import('ui-component/events'));
 const TicketManagement = lazy(() => import('ui-component/tickets'))
 const Bookings = lazy(() => import('ui-component/bookings'))
 const Profile = lazy(() => import('ui-component/profile'))
-
+const Revenue = lazy(()=>import('ui-component/revenue'))
+const Subscription = lazy(()=> import('ui-component/subscription'))
 const UserFeedbackPage = lazy(() => import('ui-component/user_feedback/index'));
 const UserRatingPage = lazy(() => import('ui-component/user_rating/index'));
 const NopageFound = lazy(() => import('ui-component/common/no-page/NoPage'));
@@ -64,6 +65,14 @@ const MainRoutes = {
       )
     },
     {
+      path: 'revenue',
+      element: (
+        <Suspense fallback={<Loader />}>
+          <Revenue />
+        </Suspense>
+      )
+    },
+    {
       path: 'profile',
       element: (
         <Suspense fallback={<Loader />}>
@@ -86,6 +95,15 @@ const MainRoutes = {
           <UserRatingPage />
         </Suspense>
       )
+    },
+    {
+      path: 'subscription',
+      element: (
+        <Suspense fallback={<Loader />}>
+          <Subscription />
+        </Suspense>
+      )
+
     },
     {
       path: '*',
