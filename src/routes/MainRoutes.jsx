@@ -9,7 +9,7 @@ import AuthGuard from 'utils/authGuard';
 const DashboardDefault = lazy(() => import('ui-component/dashboard'));
 const Events = lazy(() => import('ui-component/events'));
 const TicketManagement = lazy(() => import('ui-component/tickets'))
-const Bookings = lazy(() => import('ui-component/bookings'))
+const Bookings = lazy(() => import('ui-component/bookings/order'))
 const Profile = lazy(() => import('ui-component/profile'))
 
 const UserFeedbackPage = lazy(() => import('ui-component/user_feedback/index'));

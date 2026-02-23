@@ -120,7 +120,6 @@ const TicketManagement = () => {
                 ))}
               </TableRow>
             </TableHead>
-
             <TableBody>
               {filteredTickets?.map((ticket) => (
                 <TableRow key={ticket._id}>

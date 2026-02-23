@@ -13,7 +13,7 @@ const ticketSlice = createSlice({
     /* CREATE TICKET TYPE */
     createTicketRequest: (state) => {
       state.loading = true;
-      state.error = null;
+      state.error = null; 
     },
     createTicketSuccess: (state) => {
       state.loading = false;

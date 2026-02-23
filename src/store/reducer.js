@@ -6,6 +6,7 @@ import loginReducer from 'container/LoginContainer/slice';
 import ratingReducer from 'container/RatingContainer/slice';
 import eventReducer from "../container/eventContainer/slice"; // ✅ THIS
 import ticketReducer from "../container/ticketcontainer/slice";
+import orderReducer from "../container/orderContainer/slice"
 
 
 
@@ -18,6 +19,7 @@ const reducer = combineReducers({
   rating: ratingReducer,
   event: eventReducer, // ✅ event state added
   ticket: ticketReducer,
+  order: orderReducer
 });
 
 export default reducer;

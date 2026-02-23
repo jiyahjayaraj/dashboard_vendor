@@ -1,0 +1,118 @@
+.order-container {
+  padding: 20px;
+  background-color: #0f0f0f;
+  color: #ffffff;
+  min-height: 100vh;
+}
+
+.order-header h2 {
+  margin-bottom: 5px;
+  color: #ff7a00;
+}
+
+.order-header p {
+  color: #bbb;
+}
+
+.order-controls {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+}
+
+.order-controls select,
+.order-controls input {
+  padding: 8px 12px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  outline: none;
+  background-color: #1a1a1a;
+  color: #fff;
+}
+
+.order-controls select:focus,
+.order-controls input:focus {
+  border-color: #ff7a00;
+}
+
+/* TABLE */
+
+.order-table {
+  background: #1a1a1a;
+  border-radius: 8px;
+  overflow-x: auto;
+  box-shadow: 0 0 10px rgba(255, 122, 0, 0.1);
+}
+
+.order-table table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.order-table thead {
+  background-color: #111;
+}
+
+.order-table th,
+.order-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #2a2a2a;
+  vertical-align: middle;
+}
+
+.order-table th {
+  font-weight: 600;
+  color: #ff7a00;
+}
+
+.order-table tbody tr:hover {
+  background-color: #222;
+}
+
+/* STATUS STYLING */
+
+.status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+/* Pending */
+.status.pending {
+  background-color: rgba(255, 122, 0, 0.15);
+  color: #ff7a00;
+}
+
+/* Approved / Paid */
+.status.approved,
+.status.paid {
+  background-color: rgba(0, 255, 170, 0.15);
+  color: #00ffaa;
+}
+
+/* Rejected / Failed */
+.status.rejected,
+.status.failed {
+  background-color: rgba(255, 0, 60, 0.15);
+  color: #ff003c;
+}
+
+/* Completed */
+.status.completed {
+  background-color: rgba(0, 200, 255, 0.15);
+  color: #00c8ff;
+}
+/* import useCounter from "../../hooks/useCounter"
+function counter(){
+const{count,increment,decrement}=useCounter(0)
+return(
+  <div> 
+    <h2>{count}</h2>
+    <button onclick={increment}>+</button>
+    <button onclick={decrement}></button>
+    <div/>
+)
+} */
