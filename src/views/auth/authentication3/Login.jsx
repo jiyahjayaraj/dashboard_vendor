@@ -56,7 +56,7 @@ const AuthLogin = (props) => {
         width: { xs: '100%', sm: '400px', md: '450px' },
         p: { xs: 3, sm: 4 },
         borderRadius: 3,
-        backgroundColor: '#141414',
+        backgroundColor: '#000000',
         boxShadow: '0px 0px 15px #ff7a18',
         display: 'flex',
         flexDirection: 'column',

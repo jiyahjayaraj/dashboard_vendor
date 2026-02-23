@@ -8,10 +8,10 @@ import appConfig from '../../config';
 import * as actionType from './slice';
 
 function* login(action) {
- const loginReq = {
-  vendorEmail: action.payload.email,
-  password: action.payload.password
-};
+  const loginReq = {
+    vendorEmail: action.payload.email,
+    password: action.payload.password
+  };
 
 
   try {
@@ -25,8 +25,11 @@ function* login(action) {
     };
 
     const res = yield call(commonApi, params);
+    console.log('LOGIN RES:', res);
 
     if (res) {
+      localStorage.setItem("token", res.vendor_token);
+      
 
       yield call(toast.success, 'Login successful', { autoClose: 3000 });
 
@@ -37,7 +40,7 @@ function* login(action) {
       yield call(toast.error, 'Login failed. Please try again.', { autoClose: 3000 });
     }
   }
-   catch (error) {
+  catch (error) {
     console.error('Login failed:', error);
     yield call(toast.error, 'Login failed. Please try again.', { autoClose: 3000 });
   }
@@ -47,13 +50,12 @@ function* userMe() {
     const params = {
       api: `${appConfig.ip}/api/vendor_dashboard`,
       method: 'GET',
-      successAction: actionType.userMeSuccess(),
-      failAction: actionType.userMeFail(),
-      authorization: `Bearer`,
+      authorization: 'Bearer',
+      token: localStorage.getItem("token")
     };
 
     const res = yield call(commonApi, params);
-    
+
     yield put(actionType.userMeSuccess(res));
   } catch (error) {
     console.error('Fetch User failed:', error);

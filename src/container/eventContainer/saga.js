@@ -19,7 +19,7 @@ import commonApi from "../api";
 function* createEventSaga(action) {
   try {
     const res = yield call(commonApi, {
-      api: "http://localhost:5000/api/events",
+      api: "http://localhost:5000/api/events/vendor",
       method: "POST",
       body: action.payload
     });
@@ -45,7 +45,7 @@ function* getEventsSaga(action) {
     if (!vendorId) throw new Error("Vendor ID is required");
 
     const res = yield call(commonApi, {
-      api: `http://localhost:5000/api/events/${vendorId}`,
+      api: `http://localhost:5000/api/events/vendor/${vendorId}`,
       method: "GET"
     });
 
@@ -65,7 +65,7 @@ function* updateEventSaga(action) {
     const { id, data } = action.payload;
 
     const res = yield call(commonApi, {
-      api: `http://localhost:5000/api/events/${id}`,
+      api: `http://localhost:5000/api/events/vendor/${id}`,
       method: "PUT",
       body: data
     });

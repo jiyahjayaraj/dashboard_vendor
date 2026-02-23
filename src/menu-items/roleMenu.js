@@ -40,14 +40,14 @@ const RoleMenu = {
     icon: icons.IconClipboardList,
     breadcrumbs: false
   },
-  {
-    id: 'revenue-reports',
-    title: 'Revenue Reports',
-    type: 'item',
-    url: '/reports/revenue',
-    icon: icons.IconChartLine,
-    breadcrumbs: false
-  },
+  // {
+  //   id: 'revenue-reports',
+  //   title: 'Revenue Reports',
+  //   type: 'item',
+  //   url: '/revenue',
+  //   icon: icons.IconChartLine,
+  //   breadcrumbs: false
+  // },
   {
     id: 'profile',
     title: 'Profile',

@@ -32,9 +32,6 @@ export default function BackgroundLetterAvatars() {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
-  console.log("userData",user);
-  
-
   const dispatch = useDispatch();
 
   useEffect(() => {

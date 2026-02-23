@@ -51,6 +51,10 @@
   display: flex;
   gap: 8px;
 }
+.event-actions button{
+  border:1px solid #ff7a00;
+  border-radius: 10px;
+}
 
 .empty-state {
   text-align: center;
