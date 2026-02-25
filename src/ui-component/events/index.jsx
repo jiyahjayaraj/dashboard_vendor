@@ -150,7 +150,7 @@ export default function Events() {
 
       {events.length > 0 && (
         <Box className="events-list">
-          {events.map((e) => (
+{[...events].reverse().map((e) => (    
             <Box key={e._id} className="event-card">
 
               <Box className="event-image">
