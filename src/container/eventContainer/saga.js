@@ -65,7 +65,7 @@ function* updateEventSaga(action) {
     const { id, data } = action.payload;
 
     const res = yield call(commonApi, {
-      api: `http://localhost:5000/api/events/vendor/${id}`,
+      api: `http://localhost:5000/api/events/${id}`,
       method: "PUT",
       body: data
     });

@@ -20,26 +20,20 @@ export const userFeedback = {
 };
 
 export const userRating = {
-  keys: ['facilityTitle', 'comments', 'starRating'],
+  keys: ['comments', 'starRating'],
   config: {
-     facilityTitle: {
-      label: 'Facility Title',
-      type: 'string',
-      class: ' commonDesc'
-    },
     comments: {
       label: 'Comment',
       type: 'string',
       class: 'cmn_Cap commonDesc'
     },
     starRating: {
-      label: 'Rating', 
-      type: 'number',
+      label: 'Rating',
+      type: 'jsx', 
       class: 'cmn_Cap commonDesc'
     }
   }
 };
-  
 
 export const facilityHeads = {
   keys: ['title', 'facilityType','createdUser','createdOn', 'avgStarRating','status'],

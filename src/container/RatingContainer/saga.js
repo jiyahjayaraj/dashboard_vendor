@@ -6,33 +6,97 @@ import commonApi from '../api';
 import appConfig from '../../config';
 import * as actionType from './slice';
 
-// Base API endpoint for ratings
-const RATING_API_BASE = `${appConfig.ip}`;
+// Base API endpoint
 
 
-
-
-function* getRatingsSaga(action) {
-  const tokenData = JSON.parse(localStorage.getItem('Token'));
-  const accessToken = tokenData?.accessToken;
+/* ============================
+   GET VENDOR FEEDBACKS
+============================ */
+function* getVendorFeedbacksSaga() {
   try {
-    let params = {
-      api: `${RATING_API_BASE}/${action.payload}`,
-      method: 'GET',
-      successAction: actionType.getRatingCountSuccess(),
-      failAction: actionType.getRatingCountFail(),
-      authorization: 'Bearer',
-      token:  accessToken
-    };
-   let res = yield call(commonApi, params);
-  } catch (error) {
-    console.error('Fetch user Feedback count failed:', error);
 
-  }
+    const accessToken = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+
+    const params = {
+      api: `${appConfig.ip}/api/vendor/feedbacks`,
+      method: 'GET',
+      authorization: 'Bearer',
+      token: accessToken
+    };
+
+    const response = yield call(commonApi, params);
+
+    console.log("API Response:", response);
+
+    yield put(
+      actionType.getVendorFeedbacksSuccess(response)
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    yield put(
+      actionType.getVendorFeedbacksFail(error.message)
+    );
+
+  }
+}
+/* ============================
+   DELETE FEEDBACK
+============================ */
+
+function* deleteFeedbackSaga(action) {
+  try {
+
+    const accessToken = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
+
+    const params = {
+      api: `${appConfig.ip}/api/vendor/feedback/${action.payload}`,
+      method: 'DELETE',
+      authorization: 'Bearer',
+      token: accessToken
+    };
+
+    yield call(commonApi, params);
+
+    yield put(
+      actionType.deleteFeedbackSuccess(
+        action.payload
+      )
+    );
+
+    toast.success("Feedback deleted");
+
+  } catch (error) {
+
+    yield put(
+      actionType.deleteFeedbackFail(
+        error.message
+      )
+    );
+
+    toast.error("Delete failed");
+
+  }
 }
 
-
 export default function* ratingWatcher() {
-    yield takeEvery(actionType.getRatingCount.type, getRatingsSaga);
+
+  yield takeEvery(
+    actionType.getVendorFeedbacks.type,
+    getVendorFeedbacksSaga
+  );
+
+  yield takeEvery(
+    actionType.deleteFeedback.type,
+    deleteFeedbackSaga
+  );
 
 }

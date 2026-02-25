@@ -6,7 +6,7 @@ const TableHead = ({ keys = [], config, hasAction = true, hideArray = [], slNo =
   const style = styles(theme);
   return (
     <MuiTableHead>
-      <TableRow sx={{ backgroundColor: `#34699c`, boxShadow: '0px 0px 8px rgba(0, 0, 0, 0.3)' }}>
+      <TableRow sx={{  boxShadow: '0px 0px 8px rgba(0, 0, 0, 0.3)' }}>
         {slNo ? (
           <TableCell
             sx={{
