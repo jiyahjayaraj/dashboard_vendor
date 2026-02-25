@@ -150,7 +150,7 @@ export default function Events() {
 
       {events.length > 0 && (
         <Box className="events-list">
-          {events.map((e) => (
+{[...events].reverse().map((e) => (    
             <Box key={e._id} className="event-card">
 
               <Box className="event-image">
@@ -194,6 +194,7 @@ export default function Events() {
                   onClick={() => {
                     setForm({
                       ...e,
+                      eventDate: e.eventDate?.split("T")[0],
                       bannerImage: null
                     });
                     setPreview(
@@ -209,7 +210,7 @@ export default function Events() {
                   Edit
                 </Button>
 
-             
+
               </Box>
 
             </Box>
@@ -218,162 +219,162 @@ export default function Events() {
       )}
 
       {/* CREATE / EDIT DRAWER */}
-<Drawer
-  anchor="right"
-  open={openDrawer}
-  onClose={() => setOpenDrawer(false)}
-  {...drawerStyle}
->
-  <Box className="event-drawer">
+      <Drawer
+        anchor="right"
+        open={openDrawer}
+        onClose={() => setOpenDrawer(false)}
+        {...drawerStyle}
+      >
+        <Box className="event-drawer">
 
-    <Typography className="drawer-title">
-      {isEdit ? "Update Event" : "Create Event"}
-    </Typography>
+          <Typography className="drawer-title">
+            {isEdit ? "Update Event" : "Create Event"}
+          </Typography>
 
-    {/* ================= BASIC INFO ================= */}
-    <div className="drawer-card">
-      <Typography className="section-heading">
-        Basic Information
-      </Typography>
+          {/* ================= BASIC INFO ================= */}
+          <div className="drawer-card">
+            <Typography className="section-heading">
+              Basic Information
+            </Typography>
 
-      <TextField
-        fullWidth
-        name="eventName"
-        label="Event Title *"
-        value={form.eventName}
-        onChange={handleChange}
-      />
+            <TextField
+              fullWidth
+              name="eventName"
+              label="Event Title *"
+              value={form.eventName}
+              onChange={handleChange}
+            />
 
-      <TextField
-        fullWidth
-        multiline
-        rows={4}
-        name="description"
-        label="Event Description *"
-        value={form.description}
-        onChange={handleChange}
-        sx={{ mt: 2 }}
-      />
+            <TextField
+              fullWidth
+              multiline
+              rows={4}
+              name="description"
+              label="Event Description *"
+              value={form.description}
+              onChange={handleChange}
+              sx={{ mt: 2 }}
+            />
 
-      <TextField
-        fullWidth
-        name="category"
-        label="Category *"
-        value={form.category}
-        onChange={handleChange}
-        sx={{ mt: 2 }}
-      />
-    </div>
+            <TextField
+              fullWidth
+              name="category"
+              label="Category *"
+              value={form.category}
+              onChange={handleChange}
+              sx={{ mt: 2 }}
+            />
+          </div>
 
-    {/* ================= EVENT BANNER ================= */}
-    <div className="drawer-card">
-      <Typography className="section-heading">
-        Event Banner
-      </Typography>
-      <Typography className="section-sub">
-        Upload an attractive banner image for your event
-      </Typography>
+          {/* ================= EVENT BANNER ================= */}
+          <div className="drawer-card">
+            <Typography className="section-heading">
+              Event Banner
+            </Typography>
+            <Typography className="section-sub">
+              Upload an attractive banner image for your event
+            </Typography>
 
-      <div className="upload-box">
-        <input type="file" accept="image/*" onChange={handleFileChange} />
-        {preview && (
-          <img src={preview} alt="preview" className="preview-img" />
-        )}
-      </div>
-    </div>
+            <div className="upload-box">
+              <input type="file" accept="image/*" onChange={handleFileChange} />
+              {preview && (
+                <img src={preview} alt="preview" className="preview-img" />
+              )}
+            </div>
+          </div>
 
-    {/* ================= LOCATION ================= */}
-    <div className="drawer-card">
-      <Typography className="section-heading">
-        Location & Venue
-      </Typography>
-      <Typography className="section-sub">
-        Where will your event take place?
-      </Typography>
+          {/* ================= LOCATION ================= */}
+          <div className="drawer-card">
+            <Typography className="section-heading">
+              Location & Venue
+            </Typography>
+            <Typography className="section-sub">
+              Where will your event take place?
+            </Typography>
 
-      <Grid container spacing={2} sx={{ mt: 1 }}>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            name="city"
-            label="City / Location *"
-            value={form.city}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            name="eventLocation"
-            label="Venue Name *"
-            value={form.eventLocation}
-            onChange={handleChange}
-          />
-        </Grid>
-      </Grid>
-    </div>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  name="city"
+                  label="City / Location *"
+                  value={form.city}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  name="eventLocation"
+                  label="Venue Name *"
+                  value={form.eventLocation}
+                  onChange={handleChange}
+                />
+              </Grid>
+            </Grid>
+          </div>
 
-    {/* ================= DATE & TIME ================= */}
-    <div className="drawer-card">
-      <Typography className="section-heading">
-        Date & Time
-      </Typography>
-      <Typography className="section-sub">
-        When will your event take place?
-      </Typography>
+          {/* ================= DATE & TIME ================= */}
+          <div className="drawer-card">
+            <Typography className="section-heading">
+              Date & Time
+            </Typography>
+            <Typography className="section-sub">
+              When will your event take place?
+            </Typography>
 
-      <Grid container spacing={2} sx={{ mt: 1 }}>
-        <Grid item xs={4}>
-          <TextField
-            fullWidth
-            type="date"
-            name="eventDate"
-            label="Event Date *"
-            InputLabelProps={{ shrink: true }}
-            value={form.eventDate}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item xs={4}>
-          <TextField
-            fullWidth
-            type="time"
-            name="startTime"
-            label="Start Time *"
-            InputLabelProps={{ shrink: true }}
-            value={form.startTime}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item xs={4}>
-          <TextField
-            fullWidth
-            type="time"
-            name="endTime"
-            label="End Time *"
-            InputLabelProps={{ shrink: true }}
-            value={form.endTime}
-            onChange={handleChange}
-          />
-        </Grid>
-      </Grid>
-    </div>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={4}>
+                <TextField
+                  fullWidth
+                  type="date"
+                  name="eventDate"
+                  label="Event Date *"
+                  InputLabelProps={{ shrink: true }}
+                  value={form.eventDate}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  fullWidth
+                  type="time"
+                  name="startTime"
+                  label="Start Time *"
+                  InputLabelProps={{ shrink: true }}
+                  value={form.startTime}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  fullWidth
+                  type="time"
+                  name="endTime"
+                  label="End Time *"
+                  InputLabelProps={{ shrink: true }}
+                  value={form.endTime}
+                  onChange={handleChange}
+                />
+              </Grid>
+            </Grid>
+          </div>
 
-    {/* ================= TICKETING ================= */}
-    
+          {/* ================= TICKETING ================= */}
 
-    {/* ================= ACTIONS ================= */}
-    <Box className="drawer-actions">
-      <Button variant="outlined" className="draft-btn">
-        Save as Draft
-      </Button>
-      <Button variant="contained" onClick={handleSubmit}>
-        {isEdit ? "Update Event" : "Create Event"}
-      </Button>
-    </Box>
 
-  </Box>
-</Drawer>
+          {/* ================= ACTIONS ================= */}
+          <Box className="drawer-actions">
+            <Button variant="outlined" className="draft-btn">
+              Save as Draft
+            </Button>
+            <Button variant="contained" onClick={handleSubmit}>
+              {isEdit ? "Update Event" : "Create Event"}
+            </Button>
+          </Box>
+
+        </Box>
+      </Drawer>
 
 
       {/* VIEW DRAWER */}
@@ -397,7 +398,7 @@ export default function Events() {
       </Drawer>
 
       {/* MANAGE TICKETS DRAWER */}
-      
+
 
     </Box>
   );
