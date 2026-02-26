@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useTheme } from '@mui/material/styles';
 import {
   TableContainer,
@@ -16,6 +16,7 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 
 // Redux
 import { getVendorFeedbacks, deleteFeedback } from 'container/RatingContainer/slice';
+import { getEventsRequest } from 'container/eventContainer/slice';
 
 // Table config
 import { userRating } from 'utils/TableConfig';
@@ -30,23 +31,29 @@ export default function UserRating() {
   const theme = useTheme();
   const dispatch = useDispatch();
 
+  const vendorId = useSelector((state) => state.login?.userData?._id);
+  const events = useSelector((state) => state.event?.events || []);
+  const ratingsList = useSelector((state) => state.rating?.list || []);
+  const avgRating = useSelector((state) => state.rating?.avgRating || 0);
+  
   const [page, setPage] = useState(0);
-  const [limit] = useState(20);
+  const limit = 20;
   const [searchQuery, setSearchQuery] = useState('');
-
-  // Redux state
-  const ratingsList = useSelector((state) => state.rating.list);
-  const count = useSelector((state) => state.rating.listCount);
-  const avgRating = useSelector((state) => state.rating.avgRating);
 
   const { config, keys } = userRating;
 
   /* =========================
-     FETCH VENDOR FEEDBACKS
+     FETCH DATA
   ========================= */
   useEffect(() => {
     dispatch(getVendorFeedbacks());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (vendorId) {
+      dispatch(getEventsRequest({ vendorId }));
+    }
+  }, [dispatch, vendorId]);
 
   /* =========================
      STAR RENDER
@@ -66,25 +73,54 @@ export default function UserRating() {
   /* =========================
      FILTER + PAGINATION
   ========================= */
-  const filteredList = ratingsList.filter((item) =>
-    item.comment?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredList = useMemo(() => {
+    return ratingsList.filter((item) => {
+      const matchedEvent = events.find(
+        (ev) => String(ev._id) === String(item.eventId)
+      );
+
+      const commentMatch =
+        item.comment?.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const eventMatch =
+        matchedEvent?.eventName
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase());
+
+      return commentMatch || eventMatch;
+    });
+  }, [ratingsList, events, searchQuery]);
 
   const paginatedData = filteredList.slice(
     page * limit,
     page * limit + limit
   );
 
-  const displayedData = paginatedData.map((item) => ({
-  ...item,
-  comments: item.comment,
-  starRating: renderStars(item.rating)
-}));
+  const displayedData = paginatedData.map((item) => {
+    const matchedEvent = events.find(
+      (ev) => String(ev._id) === String(item.eventId)
+    );
+
+    return {
+      _id: item._id || item.feedbackId || item.id,
+      rating: item.rating,
+      comment: item.comment,
+      eventId: item.eventId,
+      createdAt: item.createdAt,
+      starRating: renderStars(item.rating),
+      eventName: matchedEvent?.eventName || "Unknown Event"
+    };
+  });
+
   const handleDelete = (row) => {
-    if (window.confirm("Delete this feedback?")) {
-      dispatch(deleteFeedback(row._id));
+    const feedbackId = row?._id;
+    const eventId = row?.eventId;
+
+    if (feedbackId && eventId && window.confirm("Delete this feedback?")) {
+      dispatch(deleteFeedback({ eventId, feedbackId }));
     }
   };
+
   const countPagination = Math.ceil(filteredList.length / limit);
 
   return (
@@ -95,7 +131,7 @@ export default function UserRating() {
         Ratings & Feedback
       </Typography>
 
-      {/* Summary Card */}
+      {/* Summary */}
       <Grid container spacing={2} mb={3}>
         <Grid item xs={12} md={4}>
           <Box
@@ -106,10 +142,12 @@ export default function UserRating() {
             }}
           >
             <Typography variant="h3" fontWeight={700}>
-              {avgRating || 0}
+              {avgRating}
             </Typography>
             <Box>{renderStars(Math.round(avgRating))}</Box>
-            <Typography variant="body2">Average Rating</Typography>
+            <Typography variant="body2">
+              Average Rating
+            </Typography>
           </Box>
         </Grid>
       </Grid>
@@ -138,7 +176,7 @@ export default function UserRating() {
         <Table>
           <TableHead keys={keys} config={config} />
           <TableRows
-            data={displayedData}   // IMPORTANT change
+            data={displayedData}
             keys={keys}
             config={config}
             handleDeleteModal={handleDelete}

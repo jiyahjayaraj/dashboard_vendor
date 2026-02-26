@@ -46,7 +46,7 @@ const TableRows = ({
   const theme = useTheme();
   const style = styles(theme);
 
-  console.log("Table Data =", data);
+  console.log("Table Data FULL =", data);
 
   /* =========================
      Cell Content Formatter
@@ -122,9 +122,7 @@ const TableRows = ({
               return (
 
                 <TableCell key={index}>
-
                   <Tooltip title={String(cellContent(keyItem, row))}>
-
                     <Typography>
 
                       {cellContent(keyItem, row)}
@@ -163,10 +161,10 @@ const TableRows = ({
                   {hasDelete && (
                     <Tooltip title="Delete">
                       <IconButton
-                        onClick={() =>
-                          handleDeleteModal &&
-                          handleDeleteModal(row)
-                        }
+                        onClick={() => {
+                          console.log("ROW CLICKED =", row);
+                          handleDeleteModal && handleDeleteModal(row);
+                        }}
                       >
                         <DeleteIcon />
                       </IconButton>

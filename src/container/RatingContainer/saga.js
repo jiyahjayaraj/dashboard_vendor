@@ -1,53 +1,53 @@
-import { takeEvery, call, put } from 'redux-saga/effects';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+  import { takeEvery, call, put } from 'redux-saga/effects';
+  import { toast } from 'react-toastify';
+  import 'react-toastify/dist/ReactToastify.css';
 
-import commonApi from '../api';
-import appConfig from '../../config';
-import * as actionType from './slice';
+  import commonApi from '../api';
+  import appConfig from '../../config';
+  import * as actionType from './slice';
 
-// Base API endpoint
+  // Base API endpoint
 
 
-/* ============================
-   GET VENDOR FEEDBACKS
-============================ */
-function* getVendorFeedbacksSaga() {
-  try {
+  /* ============================
+    GET VENDOR FEEDBACKS
+  ============================ */
+  function* getVendorFeedbacksSaga() {
+    try {
 
-    const accessToken = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('token='))
-      ?.split('=')[1];
+      const accessToken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('token='))
+        ?.split('=')[1];
 
-    const params = {
-      api: `${appConfig.ip}/api/vendor/feedbacks`,
-      method: 'GET',
-      authorization: 'Bearer',
-      token: accessToken
-    };
+      const params = {
+        api: `${appConfig.ip}/api/vendor/feedbacks`,
+        method: 'GET',
+        authorization: 'Bearer',
+        token: accessToken
+      };
 
-    const response = yield call(commonApi, params);
+      const response = yield call(commonApi, params);
 
-    console.log("API Response:", response);
+      console.log("API Response:", response);
 
-    yield put(
-      actionType.getVendorFeedbacksSuccess(response)
-    );
+      yield put(
+        actionType.getVendorFeedbacksSuccess(response)
+      );
 
-  } catch (error) {
+    } catch (error) {
 
-    console.error(error);
+      console.error(error);
 
-    yield put(
-      actionType.getVendorFeedbacksFail(error.message)
-    );
+      yield put(
+        actionType.getVendorFeedbacksFail(error.message)
+      );
 
+    }
   }
-}
-/* ============================
-   DELETE FEEDBACK
-============================ */
+  /* ============================
+    DELETE FEEDBACK
+  ============================ */
 
 function* deleteFeedbackSaga(action) {
   try {
@@ -57,8 +57,10 @@ function* deleteFeedbackSaga(action) {
       .find(row => row.startsWith('token='))
       ?.split('=')[1];
 
+    const { feedbackId } = action.payload;   // ✅ extract ID properly
+
     const params = {
-      api: `${appConfig.ip}/api/vendor/feedback/${action.payload}`,
+      api: `${appConfig.ip}/api/vendor/feedback/${feedbackId}`,  // ✅ correct ID
       method: 'DELETE',
       authorization: 'Bearer',
       token: accessToken
@@ -67,9 +69,7 @@ function* deleteFeedbackSaga(action) {
     yield call(commonApi, params);
 
     yield put(
-      actionType.deleteFeedbackSuccess(
-        action.payload
-      )
+      actionType.deleteFeedbackSuccess(feedbackId)   // ✅ pass only ID
     );
 
     toast.success("Feedback deleted");
@@ -77,26 +77,23 @@ function* deleteFeedbackSaga(action) {
   } catch (error) {
 
     yield put(
-      actionType.deleteFeedbackFail(
-        error.message
-      )
+      actionType.deleteFeedbackFail(error.message)
     );
 
     toast.error("Delete failed");
-
   }
 }
 
-export default function* ratingWatcher() {
+  export default function* ratingWatcher() {
 
-  yield takeEvery(
-    actionType.getVendorFeedbacks.type,
-    getVendorFeedbacksSaga
-  );
+    yield takeEvery(
+      actionType.getVendorFeedbacks.type,
+      getVendorFeedbacksSaga
+    );
 
-  yield takeEvery(
-    actionType.deleteFeedback.type,
-    deleteFeedbackSaga
-  );
+    yield takeEvery(
+      actionType.deleteFeedback.type,
+      deleteFeedbackSaga
+    );
 
-}
+  }

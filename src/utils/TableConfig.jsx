@@ -20,21 +20,30 @@ export const userFeedback = {
 };
 
 export const userRating = {
-  keys: ['comments', 'starRating'],
+  keys: ['starRating', 'eventName', 'comment'],
+
   config: {
-    comments: {
-      label: 'Comment',
+
+    starRating: {
+      label: 'Rating',
+      type: 'jsx',
+      class: 'cmn_Cap commonDesc'
+    },
+
+    eventName: {
+      label: 'Event Name',
       type: 'string',
       class: 'cmn_Cap commonDesc'
     },
-    starRating: {
-      label: 'Rating',
-      type: 'jsx', 
+
+    comment: {
+      label: 'Comment',
+      type: 'string',
       class: 'cmn_Cap commonDesc'
     }
+
   }
 };
-
 export const facilityHeads = {
   keys: ['title', 'facilityType','createdUser','createdOn', 'avgStarRating','status'],
   config: {
