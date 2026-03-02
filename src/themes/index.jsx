@@ -31,7 +31,7 @@ export const theme = (customization) => {
     background: '#0f141a',        // layout background
 
     // MENU & SELECTION
-    menuSelected: '#ff7a18',      // orange highlight
+    menuSelected: '#fe7816',      // orange highlight
     menuSelectedBack: 'rgba(255, 122, 24, 0.15)',
 
     // DIVIDER

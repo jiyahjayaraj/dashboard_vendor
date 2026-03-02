@@ -57,7 +57,7 @@ const AuthLogin = (props) => {
         p: { xs: 3, sm: 4 },
         borderRadius: 3,
         backgroundColor: '#000000',
-        boxShadow: '0px 0px 15px #ff7a18',
+        boxShadow: '0px 0px 15px #fe7816',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center'
@@ -123,7 +123,7 @@ const AuthLogin = (props) => {
                       <IconButton
                         onClick={handleTogglePasswordVisibility}
                         edge="end"
-                        sx={{ color: '#ff7a18' }}
+                        sx={{ color: '#fe7816' }}
                       >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
@@ -143,15 +143,15 @@ const AuthLogin = (props) => {
                   fontWeight: 600,
                   fontSize: 16,
                   color: '#000',
-                  backgroundColor: '#ff7a18',
+                  backgroundColor: '#fe7816',
                   borderRadius: 2,
-                  border: '1px solid #ff7a18',
+                  border: '1px solid #fe7816',
                   boxShadow: '0px 6px 16px rgba(255, 122, 24, 0.35)',
                   transition: 'all 0.3s ease',
                   '&:hover': {
                     backgroundColor: 'transparent',
-                    color: '#ff7a18',
-                    border: '1px solid #ff7a18',
+                    color: '#fe7816',
+                    border: '1px solid #fe7816',
                     boxShadow: '0px 8px 20px rgba(255, 122, 24, 0.45)'
                   }
                 }}
@@ -181,7 +181,7 @@ const AuthLogin = (props) => {
       </Typography>
 
       <Typography
-        sx={{ mt: 0.5, fontSize: 12, color: '#ff7a18' }}
+        sx={{ mt: 0.5, fontSize: 12, color: '#fe7816' }}
       >
         Version : {AppVersion}
       </Typography>

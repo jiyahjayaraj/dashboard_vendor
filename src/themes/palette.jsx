@@ -9,7 +9,7 @@ export default function themePalette(theme) {
     /* ================= PRIMARY (ORANGE) ================= */
     primary: {
       light: '#ff9f1c',
-      main: '#ff7a18',          // Eventora orange
+      main: '#fe7816',          // Eventora orange
       dark: '#e66a10',
       200: '#ffd8b5',
       800: '#c85c0d'
@@ -46,7 +46,7 @@ export default function themePalette(theme) {
 
     orange: {
       light: '#ffb366',
-      main: '#ff7a18',
+      main: '#fe7816',
       dark: '#cc5f12'
     },
 

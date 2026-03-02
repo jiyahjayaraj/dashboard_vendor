@@ -57,6 +57,15 @@ function* userMe() {
     const res = yield call(commonApi, params);
 
     yield put(actionType.userMeSuccess(res));
+    if (
+ !res.vendorName ||
+ !res.vendorPhone ||
+ !res.vendorAddress
+) {
+ yield put(actionType.setProfileIncomplete(true));
+} else {
+ yield put(actionType.setProfileIncomplete(false));
+}
   } catch (error) {
     console.error('Fetch User failed:', error);
     yield put(
@@ -69,7 +78,43 @@ function* userMe() {
   }
 }
 
+function* updateProfile(action) {
+  try {
+    const params = {
+      api: `${appConfig.ip}/api/updateProfile`,
+      method: "PUT",
+      authorization: "Bearer",
+      token: localStorage.getItem("token"),
+      body: action.payload
+    };
+
+    yield call(commonApi, params);
+
+    yield call(toast.success, "Profile updated successfully", {
+      autoClose: 3000
+    });
+
+    // 🔥 reload profile from DB
+    yield put(actionType.userMe());
+
+    yield put(actionType.updateProfileSuccess());
+  } catch (error) {
+    console.error("Update failed:", error);
+    yield put(
+      actionType.updateProfileFail({
+        message: error.message || "Update failed",
+        status: error.response?.status || 5000
+      })
+    );
+
+    yield call(toast.error, "Profile update failed", {
+      autoClose: 3000
+    });
+  }
+}
+
 export default function* LoginActionWatcher() {
   yield takeEvery(actionType.userLogin, login);
   yield takeEvery(actionType.userMe, userMe);
+  yield takeEvery(actionType.updateProfile, updateProfile);
 }

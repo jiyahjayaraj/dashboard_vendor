@@ -1,22 +1,32 @@
-import { takeEvery, call, put, select } from 'redux-saga/effects';
+import { takeEvery, call, put } from 'redux-saga/effects';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import commonApi from '../api';
 import appConfig from '../../config';
-import * as actionType from './slice';
-
+import {
+  getSubscription,
+  getSubscriptionSuccess,
+  getSubscriptionFail,
+  updateSubscription,
+  updateSubscriptionSuccess,
+  updateSubscriptionFail,
+  cancelSubscription,
+  cancelSubscriptionSuccess,
+  cancelSubscriptionFail
+} from './slice';
 
 function* getAuthToken() {
   return localStorage.getItem('token');
 }
 
+/* ================= GET SUBSCRIPTION ================= */
 function* getSubscriptionSaga() {
   try {
     const token = yield call(getAuthToken);
 
     if (!token) {
-      yield put(actionType.getSubscriptionSuccess(null));
+      yield put(getSubscriptionSuccess(null));
       return;
     }
 
@@ -28,25 +38,25 @@ function* getSubscriptionSaga() {
     };
 
     const res = yield call(commonApi, params);
+    const subscription = res?.data?.data ?? null;
 
-    yield put(
-      actionType.getSubscriptionSuccess(res?.data?.data ?? null)
-    );
+    yield put(getSubscriptionSuccess(subscription));
   } catch (error) {
     yield put(
-      actionType.getSubscriptionFail(
+      getSubscriptionFail(
         error?.message || 'Failed to fetch subscription'
       )
     );
   }
 }
 
+/* ================= UPDATE SUBSCRIPTION ================= */
 function* updateSubscriptionSaga(action) {
   try {
     const token = yield call(getAuthToken);
-    if (!token) {
-      yield call(toast.error, 'Please login to update subscription');
 
+    if (!token) {
+      toast.error('Please login to update subscription');
       return;
     }
 
@@ -59,31 +69,30 @@ function* updateSubscriptionSaga(action) {
     };
 
     const res = yield call(commonApi, params);
+    const subscription = res?.data?.data ?? null;
 
-    yield put(
-      actionType.updateSubscriptionSuccess(res?.data?.data)
-    );
+    yield put(updateSubscriptionSuccess(subscription));
+    toast.success('Plan updated successfully');
 
-    yield call(toast.success,'Plan updated successfully')
-
-    
-    yield put(actionType.getSubscription());
+    // Refresh subscription safely
+    yield put(getSubscription());
   } catch (error) {
     yield put(
-      actionType.updateSubscriptionFail(
+      updateSubscriptionFail(
         error?.message || 'Update failed'
       )
     );
-
-    yield call(toast.error,'Failed to update plan')
+    toast.error('Failed to update plan');
   }
 }
 
+/* ================= CANCEL SUBSCRIPTION ================= */
 function* cancelSubscriptionSaga() {
   try {
     const token = yield call(getAuthToken);
+
     if (!token) {
-       yield call(toast.error, 'Please login to cancel subscription');
+      toast.error('Please login to cancel subscription');
       return;
     }
 
@@ -95,44 +104,25 @@ function* cancelSubscriptionSaga() {
     };
 
     const res = yield call(commonApi, params);
+    const subscription = res?.data?.data ?? null;
 
-    yield put(
-      actionType.cancelSubscriptionSuccess(res?.data?.data)
-    );
+    yield put(cancelSubscriptionSuccess(subscription));
+    toast.success('Subscription cancelled');
 
-    toast.success('Subscription cancelled', {
-      autoClose: 3000
-    });
-
-    // Refresh subscription
-    yield put(actionType.getSubscription());
+    yield put(getSubscription());
   } catch (error) {
     yield put(
-      actionType.cancelSubscriptionFail(
+      cancelSubscriptionFail(
         error?.message || 'Cancel failed'
       )
     );
-
-    toast.error('Failed to cancel subscription', {
-      autoClose: 3000
-    });
+    toast.error('Failed to cancel subscription');
   }
 }
 
-
+/* ================= WATCHER ================= */
 export default function* SubscriptionWatcher() {
-  yield takeEvery(
-    actionType.getSubscription.type,
-    getSubscriptionSaga
-  );
-
-  yield takeEvery(
-    actionType.updateSubscription.type,
-    updateSubscriptionSaga
-  );
-
-  yield takeEvery(
-    actionType.cancelSubscription.type,
-    cancelSubscriptionSaga
-  );
+  yield takeEvery(getSubscription.type, getSubscriptionSaga);
+  yield takeEvery(updateSubscription.type, updateSubscriptionSaga);
+  yield takeEvery(cancelSubscription.type, cancelSubscriptionSaga);
 }

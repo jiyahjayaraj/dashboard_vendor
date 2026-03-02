@@ -13,12 +13,17 @@ import {
   Drawer,
   Grid,
   TextField,
-  Typography
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from "@mui/material";
 
 import "./events.css";
 
 export default function Events() {
+  const [eventTypes, setEventTypes] = useState([]);
   const dispatch = useDispatch();
 
   const events = useSelector((state) => state.event?.events || []);
@@ -50,7 +55,15 @@ export default function Events() {
     earlyDeadline: "",
     bannerImage: null
   });
+  useEffect(() => {
 
+    fetch("http://localhost:5000/api/eventtypes")
+      .then(res => res.json())
+      .then(data => {
+        setEventTypes(data.data || []);
+      });
+
+  }, []);
   useEffect(() => {
     if (vendorId) {
       dispatch(getEventsRequest({ vendorId }));
@@ -150,7 +163,7 @@ export default function Events() {
 
       {events.length > 0 && (
         <Box className="events-list">
-{[...events].reverse().map((e) => (    
+          {[...events].reverse().map((e) => (
             <Box key={e._id} className="event-card">
 
               <Box className="event-image">
@@ -256,14 +269,28 @@ export default function Events() {
               sx={{ mt: 2 }}
             />
 
-            <TextField
-              fullWidth
-              name="category"
-              label="Category *"
-              value={form.category}
-              onChange={handleChange}
-              sx={{ mt: 2 }}
-            />
+            <FormControl fullWidth sx={{ mt: 2 }}>
+              <InputLabel>Event Type *</InputLabel>
+
+              <Select
+                name="category"
+                value={form.category || ""}
+                onChange={handleChange}
+                label="Event Type *"
+              >
+                <MenuItem value="">
+                  Select Event Type
+                </MenuItem>
+
+                {eventTypes.map((type) => (
+                  <MenuItem key={type._id} value={type.name}>
+                    {type.name}
+                  </MenuItem>
+                ))}
+
+              </Select>
+
+            </FormControl>
           </div>
 
           {/* ================= EVENT BANNER ================= */}

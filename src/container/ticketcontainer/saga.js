@@ -13,6 +13,9 @@ import {
   updateTicketStatusRequest,
   updateTicketStatusSuccess,
   updateTicketStatusFailure,
+  deleteTicketRequest,
+  deleteTicketSuccess,
+  deleteTicketFailure,
 } from "./slice";
 import commonApi from "../api";
 
@@ -22,7 +25,7 @@ function* createTicketSaga(action) {
     yield call(commonApi, {
       api: `${appConfig.ip}/api/tickets/create`,
       method: "POST",
-      body: action.payload, 
+      body: action.payload,
       authorization: null,
     });
 
@@ -95,7 +98,28 @@ function* updateTicketStatusSaga(action) {
     yield put(updateTicketStatusFailure(error.message));
   }
 }
+/* DELETE TICKET TYPE */
+function* deleteTicketSaga(action) {
+  try {
+    const { ticketTypeId, eventId } = action.payload;
 
+    yield call(commonApi, {
+      api: `${appConfig.ip}/api/tickets/${ticketTypeId}`,
+      method: "DELETE",
+      authorization: null,
+    });
+
+    // remove from store immediately
+    yield put(deleteTicketSuccess(ticketTypeId));
+
+    // optional refresh (safe)
+    if (eventId) {
+      yield put(getTicketsRequest({ eventId }));
+    }
+  } catch (error) {
+    yield put(deleteTicketFailure(error.message));
+  }
+}
 
 /* WATCHER */
 export default function* ticketActionWatcher() {
@@ -103,4 +127,5 @@ export default function* ticketActionWatcher() {
   yield takeLatest(getTicketsRequest.type, getTicketsSaga);
   yield takeLatest(updateTicketRequest.type, updateTicketSaga);
   yield takeLatest(updateTicketStatusRequest.type, updateTicketStatusSaga);
+  yield takeLatest(deleteTicketRequest.type, deleteTicketSaga);
 }

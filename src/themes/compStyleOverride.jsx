@@ -23,14 +23,14 @@ export default function componentStyleOverrides() {
 
           '&.Mui-selected': {
             backgroundColor: 'rgba(255, 122, 24, 0.18)',
-            color: '#ff7a18',
+            color: '#fe7816',
 
             '&:hover': {
               backgroundColor: 'rgba(255, 122, 24, 0.25)'
             },
 
             '& .MuiListItemIcon-root': {
-              color: '#ff7a18'
+              color: '#fe7816'
             }
           }
         }

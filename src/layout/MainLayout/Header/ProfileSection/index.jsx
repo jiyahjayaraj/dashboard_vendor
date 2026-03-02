@@ -114,7 +114,7 @@ const ResponsiveIcons = () => {
         }}
         sx={{
           color: 'white',
-          backgroundColor: '#ff7a18', 
+          backgroundColor: '#fe7816', 
           '&:hover': {
             backgroundColor: '#000000' 
           },
@@ -159,7 +159,7 @@ const ResponsiveIcons = () => {
               borderColor: '#ffffff',
               color: '#ffffff',
               '&:hover': {
-                borderColor: '#ff7a18 ',
+                borderColor: '#fe7816 ',
                 backgroundColor: '#0000000a'
               }
             }}
@@ -177,7 +177,7 @@ const ResponsiveIcons = () => {
               borderRadius: 2,
               backgroundColor: '#ffffff',
               '&:hover': {
-                backgroundColor: '#ff7a18'
+                backgroundColor: '#fe7816'
               }
             }}
           >

@@ -22,8 +22,8 @@ import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { getTicketsRequest } from "../../container/ticketcontainer/slice";
 import { getEventsRequest } from "../../container/eventContainer/slice";
-
-
+import { Delete } from "@mui/icons-material";
+import { deleteTicketRequest } from "../../container/ticketcontainer/slice";
 
 const TicketManagement = () => {
   const vendorId = useSelector((state) => state.login.userData?._id);
@@ -34,6 +34,18 @@ const TicketManagement = () => {
   const dispatch = useDispatch();
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [selectedEventId, setSelectedEventId] = useState(localStorage.getItem("eventId") || "");
+
+  const handleDelete = (ticketId) => {
+    if (!window.confirm("Are you sure you want to delete this ticket type?"))
+      return;
+
+    dispatch(
+      deleteTicketRequest({
+        ticketTypeId: ticketId,
+        eventId: selectedEventId,
+      })
+    );
+  };
 
   useEffect(() => {
     if (!selectedEventId) return;
@@ -109,7 +121,7 @@ const TicketManagement = () => {
           startIcon={<Add />}
           onClick={handleCreate}
           sx={{
-            background: "linear-gradient(90deg, #ff7a18, #ff9f1c)",
+            background: "linear-gradient(90deg, #fe7816, #ff9f1c)",
             color: "#fff",
           }}
         >
@@ -229,6 +241,14 @@ const TicketManagement = () => {
                       Edit
                     </Button>
 
+                    <Button
+                      startIcon={<Delete/>}
+                      size="small"
+                      color="error"
+                      onClick={() => handleDelete(ticket._id)}
+                    >
+                    Delete
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

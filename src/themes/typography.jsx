@@ -102,7 +102,7 @@ export default function themeTypography(theme) {
         borderColor: theme.divider
       },
       '&:hover fieldset': {
-        borderColor: '#ff7a18'
+        borderColor: '#fe7816'
       }
     },
 
@@ -139,7 +139,7 @@ export default function themeTypography(theme) {
       cursor: 'pointer',
       borderRadius: '8px',
       backgroundColor: theme.paper,
-      color: '#ff7a18'
+      color: '#fe7816'
     },
     smallAvatar: {
       width: '22px',

@@ -50,7 +50,7 @@ const AnalyticsCard = () => {
       <Grid item xs={12} sm={6} md={3}>
         <Link to="/facility" style={{ textDecoration: 'none' }}>
           <Card
-            title="Active Facilities"
+            title="Total Revenue"
             count={10}
             color="#d0d7e4"
             bgTheme="#000000"
@@ -62,7 +62,7 @@ const AnalyticsCard = () => {
       <Grid item xs={12} sm={6} md={3}>
         <Link to="/reportedIssues" style={{ textDecoration: 'none' }}>
           <Card
-            title="Open Issues"
+            title="Active Events"
             count={11}
             color="#d0d7e4"
             bgTheme="#000000"
@@ -74,7 +74,7 @@ const AnalyticsCard = () => {
       <Grid item xs={12} sm={6} md={3}>
         <Link to="/rating" style={{ textDecoration: 'none' }}>
           <Card
-            title="Feedback"
+            title="Total Views"
             count={200}
             color="#d0d7e4"
             bgTheme="#000000"

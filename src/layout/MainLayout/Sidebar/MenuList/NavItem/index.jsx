@@ -89,7 +89,7 @@ const NavItem = ({ item, level, lastItem }) => {
           marginRight: leftDrawerOpened ? 0 : '0px'
         },
         '&.Mui-selected': {
-          backgroundColor: ' #ff7a18 !important',
+          backgroundColor: ' #fe7816 !important',
           marginRight: leftDrawerOpened ? 0 : '0px',
           color: '#FFFFFF'
         }
@@ -106,7 +106,7 @@ const NavItem = ({ item, level, lastItem }) => {
 
           alignItems: 'center',
           gap: '10px',
-          backgroundColor: isSelected ? ' #ff7a18 !important' : 'transparent',
+          backgroundColor: isSelected ? ' #fe7816 !important' : 'transparent',
           py: level > 1 ? 1 : 1,
           px: leftDrawerOpened ? '' : 3,
           pl: `${level * 10}px`,
@@ -119,7 +119,7 @@ const NavItem = ({ item, level, lastItem }) => {
             borderRadius: '8px',
             p: 1,
             '& svg': {
-              color: isSelected ? '#ff7a18' : '#ff7a18'
+              color: isSelected ? '#fe7816' : '#fe7816'
             }
           },
 
@@ -131,13 +131,13 @@ const NavItem = ({ item, level, lastItem }) => {
             left: 0,
             height: '2px',
             width: 0, 
-            backgroundColor: '#ff7a18',
+            backgroundColor: '#fe7816',
             transition: 'width 0.3s ease' 
           },
 
           '&:hover': {
             backgroundColor: 'inherit !important',
-            color: '#ff7a18 !important',
+            color: '#fe7816 !important',
             '&:after': {
               width: '100%' 
             },

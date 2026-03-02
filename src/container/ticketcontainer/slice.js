@@ -13,7 +13,7 @@ const ticketSlice = createSlice({
     /* CREATE TICKET TYPE */
     createTicketRequest: (state) => {
       state.loading = true;
-      state.error = null; 
+      state.error = null;
     },
     createTicketSuccess: (state) => {
       state.loading = false;
@@ -73,6 +73,20 @@ const ticketSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+    deleteTicketRequest: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    deleteTicketSuccess: (state, action) => {
+      state.loading = false;
+      state.tickets = state.tickets.filter(
+        (ticket) => ticket._id !== action.payload
+      );
+    },
+    deleteTicketFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
   },
 });
 
@@ -89,6 +103,9 @@ export const {
   updateTicketStatusRequest,
   updateTicketStatusSuccess,
   updateTicketStatusFailure,
+  deleteTicketRequest,
+  deleteTicketSuccess,
+  deleteTicketFailure,
 } = ticketSlice.actions;
 
 export default ticketSlice.reducer;

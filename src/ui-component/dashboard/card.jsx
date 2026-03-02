@@ -5,14 +5,14 @@ const Card = ({ color, bgTheme, title, count, percentage, isLoss, icon }) => {
 
 
   return (
-    <Box sx={{ background: bgTheme, padding: '20px', borderRadius: '10px',boxShadow: '0 0 0 0.5px #ff7a18'
+    <Box sx={{ background: bgTheme, padding: '20px', borderRadius: '10px',boxShadow: '0 0 0 0.5px #fe7816'
  }}>
       <Stack spacing={0.5}>
         <Grid sx={{ pb: 1.5 }} item xs zeroMinWidth>
           <Box
             sx={{
               background: "rgb(46, 25, 37)",
-              color: '#ff7a18',
+              color: '#fe7816',
               borderRadius: '12px',
               p: 2,
               display: 'inline-flex',

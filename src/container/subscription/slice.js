@@ -5,52 +5,51 @@ const subscriptionSlice = createSlice({
   initialState: {
     data: null,
     loading: false,
+    updating: false,
     error: null
   },
   reducers: {
-
-    // 🔹 GET SUBSCRIPTION
+    /* ========= GET ========= */
     getSubscription: (state) => {
       state.loading = true;
       state.error = null;
     },
     getSubscriptionSuccess: (state, action) => {
       state.loading = false;
-      state.data = action.payload;
+      state.data = action.payload; // ✅ DIRECT OBJECT
     },
     getSubscriptionFail: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
 
-    // 🔹 UPDATE PLAN
+    /* ========= UPDATE ========= */
     updateSubscription: (state) => {
-      state.loading = true;
+      state.updating = true;
       state.error = null;
     },
     updateSubscriptionSuccess: (state, action) => {
-      state.loading = false;
+      state.updating = false;
       state.data = action.payload;
     },
     updateSubscriptionFail: (state, action) => {
-      state.loading = false;
+      state.updating = false;
       state.error = action.payload;
     },
 
-    // 🔹 CANCEL PLAN
+    /* ========= CANCEL ========= */
     cancelSubscription: (state) => {
-      state.loading = true;
+      state.updating = true;
       state.error = null;
     },
     cancelSubscriptionSuccess: (state, action) => {
-      state.loading = false;
+      state.updating = false;
       state.data = action.payload;
     },
     cancelSubscriptionFail: (state, action) => {
-      state.loading = false;
+      state.updating = false;
       state.error = action.payload;
     }
-
   }
 });
 
