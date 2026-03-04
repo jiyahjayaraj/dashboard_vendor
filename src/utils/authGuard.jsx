@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { loginSuccess } from 'container/LoginContainer/slice';
+import { userMe } from 'container/LoginContainer/slice';
 
 const AuthGuard = ({ children, user }) => {
   const dispatch = useDispatch();
@@ -10,7 +10,7 @@ const AuthGuard = ({ children, user }) => {
   const checkUser = true;
 
   useEffect(() => {
-    dispatch(loginSuccess());
+    dispatch(userMe());
   }, [user]);
 
   if (!checkUser && user != null) {
