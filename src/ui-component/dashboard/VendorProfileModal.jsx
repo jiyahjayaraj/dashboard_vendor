@@ -60,33 +60,23 @@ const VendorProfileModal = () => {
         }),
 
 onSubmit: async (values) => {
-
     try {
 
         const params = {
-
-            api:`${appConfig.ip}/api/updateProfile`,
-            method:"PUT",
-            authorization:"Bearer",
-            token:localStorage.getItem("token"),
-            body:values
-
+            api: `${appConfig.ip}/api/updateProfile`,
+            method: "PUT",
+            body: values,
+            credentials: "include"   // cookies auto-sent
         };
 
         await commonApi(params);
 
-        // ✅ Reload profile from DB
         dispatch(userMe());
-
         dispatch(setProfileIncomplete(false));
 
-    }
-    catch(err){
-
+    } catch (err) {
         console.log(err);
-
     }
-
 }
 
     });

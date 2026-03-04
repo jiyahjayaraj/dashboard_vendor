@@ -6,24 +6,7 @@ import ProfileSection from 'layout/MainLayout/Header/ProfileSection';
 import { useNavigate } from 'react-router-dom';
 import { userMe } from 'container/LoginContainer/slice';
 
-const stringAvatar = (name) => ({
-  sx: {
-    bgcolor: '#ffffff54',
-    width: 40,
-    height: 40,
-    fontSize: '17px',
-    fontWeight: 500,
-    color: '#FFFFFF',
-    cursor: 'pointer'
-  },
-  children: name
-    ? name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-    : 'U'
-});
+
 
 export default function BackgroundLetterAvatars() {
   const theme = useTheme();

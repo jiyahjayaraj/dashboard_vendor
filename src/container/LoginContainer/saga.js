@@ -20,7 +20,6 @@ function* login(action) {
       method: 'POST',
       successAction: actionType.loginSuccess(),
       failAction: actionType.loginFail(),
-      authorization: null,
       body: loginReq
     };
 
@@ -28,9 +27,7 @@ function* login(action) {
     console.log('LOGIN RES:', res);
 
     if (res) {
-      localStorage.setItem("token", res.vendor_token);
-      
-
+    
       yield call(toast.success, 'Login successful', { autoClose: 3000 });
 
       yield call(userMe);
@@ -50,8 +47,7 @@ function* userMe() {
     const params = {
       api: `${appConfig.ip}/api/vendor_dashboard`,
       method: 'GET',
-      authorization: 'Bearer',
-      token: localStorage.getItem("token")
+      credentials: 'include'
     };
 
     const res = yield call(commonApi, params);
@@ -83,9 +79,8 @@ function* updateProfile(action) {
     const params = {
       api: `${appConfig.ip}/api/updateProfile`,
       method: "PUT",
-      authorization: "Bearer",
-      token: localStorage.getItem("token"),
-      body: action.payload
+      body: action.payload,  
+      credentials: 'include'
     };
 
     yield call(commonApi, params);
@@ -94,22 +89,12 @@ function* updateProfile(action) {
       autoClose: 3000
     });
 
-    // 🔥 reload profile from DB
     yield put(actionType.userMe());
-
     yield put(actionType.updateProfileSuccess());
-  } catch (error) {
-    console.error("Update failed:", error);
-    yield put(
-      actionType.updateProfileFail({
-        message: error.message || "Update failed",
-        status: error.response?.status || 5000
-      })
-    );
 
-    yield call(toast.error, "Profile update failed", {
-      autoClose: 3000
-    });
+  } catch (error) {
+    yield put(actionType.updateProfileFail(error));
+    yield call(toast.error, "Profile update failed");
   }
 }
 

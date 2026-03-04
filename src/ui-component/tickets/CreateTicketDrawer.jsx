@@ -12,7 +12,7 @@ import { createTicketRequest, updateTicketRequest, getTicketsRequest } from "../
 import { getEventsRequest } from "../../container/eventContainer/slice";
 
 const CreateTicketDrawer = ({ open, onClose, ticketData }) => {
-    console.log("🔥 CreateTicketDrawer rendered");
+    console.log(" CreateTicketDrawer rendered");
     const dispatch = useDispatch();
     const eventState = useSelector((state) => state.event);
 

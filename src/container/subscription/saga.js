@@ -1,7 +1,7 @@
 import { takeEvery, call, put } from 'redux-saga/effects';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import Cookies from 'js-cookie';
 import commonApi from '../api';
 import appConfig from '../../config';
 import {
@@ -16,8 +16,9 @@ import {
   cancelSubscriptionFail
 } from './slice';
 
+
 function* getAuthToken() {
-  return localStorage.getItem('token');
+  return Cookies.get('token');
 }
 
 /* ================= GET SUBSCRIPTION ================= */
