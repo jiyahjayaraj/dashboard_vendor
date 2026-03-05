@@ -19,8 +19,7 @@ function* getVendorOrdersSaga() {
       authorization: true,
     });
 
-    yield put(getVendorOrdersSuccess(res?.data || res));
-
+yield put(getVendorOrdersSuccess(res?.data?.orders || []));
   } catch (error) {
     yield put(
       getVendorOrdersFailure(

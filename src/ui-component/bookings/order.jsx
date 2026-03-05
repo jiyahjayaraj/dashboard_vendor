@@ -1,19 +1,7 @@
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 import React, { useEffect, useState } from "react";
-import "./Order.css";
+import "./order.css";
 import { useDispatch, useSelector } from "react-redux";
 import { getVendorOrdersRequest } from "../../container/orderContainer/slice";
 
