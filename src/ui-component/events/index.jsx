@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import {
   createEventRequest,
   getEventsRequest,
-  updateEventRequest
+  updateEventRequest,
+  clearCreatedEvent
 } from "container/eventContainer/slice";
 
 import {
@@ -25,6 +27,10 @@ import "./events.css";
 export default function Events() {
   const [eventTypes, setEventTypes] = useState([]);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const createdEvent = useSelector(
+    (state) => state.event?.createdEvent
+  );
 
   const events = useSelector((state) => state.event?.events || []);
   const user = useSelector((state) => state?.login?.userData || {});
@@ -69,6 +75,15 @@ export default function Events() {
       dispatch(getEventsRequest({ vendorId }));
     }
   }, [dispatch, vendorId]);
+
+  useEffect(() => {
+    console.log("CREATED EVENT:", createdEvent);
+
+    if (createdEvent && !isEdit) {
+      navigate('/tickets');
+      dispatch(clearCreatedEvent()); // prevent repeated navigation
+    }
+  }, [createdEvent, navigate, isEdit, dispatch]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -119,10 +134,6 @@ export default function Events() {
     } else {
       dispatch(createEventRequest(formData));
     }
-
-    setTimeout(() => {
-      dispatch(getEventsRequest({ vendorId }));
-    }, 500);
 
     setOpenDrawer(false);
     resetForm();
@@ -396,7 +407,11 @@ export default function Events() {
             <Button variant="outlined" className="draft-btn">
               Save as Draft
             </Button>
-            <Button variant="contained" onClick={handleSubmit}>
+            <Button
+              variant="contained"
+              onClick={handleSubmit}
+              disabled={!vendorId}
+            >
               {isEdit ? "Update Event" : "Create Event"}
             </Button>
           </Box>

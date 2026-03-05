@@ -24,10 +24,14 @@ function* createEventSaga(action) {
       body: action.payload
     });
 
+    // 👇 store only created event
     yield put(createEventSuccess(res));
 
-    // Refresh list
-    yield put(getEventsRequest({ vendorId: action.payload.get("vendorId") }));
+    yield put(
+      getEventsRequest({
+        vendorId: action.payload.get("vendorId")
+      })
+    );
 
   } catch (error) {
     yield put(createEventFailure(error.message));

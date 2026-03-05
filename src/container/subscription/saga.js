@@ -24,22 +24,15 @@ function* getAuthToken() {
 /* ================= GET SUBSCRIPTION ================= */
 function* getSubscriptionSaga() {
   try {
-    const token = yield call(getAuthToken);
-
-    if (!token) {
-      yield put(getSubscriptionSuccess(null));
-      return;
-    }
 
     const params = {
       api: `${appConfig.ip}/api/subscription`,
       method: 'GET',
       authorization: 'Bearer',
-      token
     };
 
     const res = yield call(commonApi, params);
-    const subscription = res?.data?.data ?? null;
+    const subscription = res.data;
 
     yield put(getSubscriptionSuccess(subscription));
   } catch (error) {
@@ -54,18 +47,12 @@ function* getSubscriptionSaga() {
 /* ================= UPDATE SUBSCRIPTION ================= */
 function* updateSubscriptionSaga(action) {
   try {
-    const token = yield call(getAuthToken);
-
-    if (!token) {
-      toast.error('Please login to update subscription');
-      return;
-    }
+    
 
     const params = {
       api: `${appConfig.ip}/api/subscription/update`,
       method: 'PUT',
       authorization: 'Bearer',
-      token,
       body: action.payload
     };
 
