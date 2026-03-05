@@ -1,4 +1,6 @@
 import { takeLatest, put, call } from "redux-saga/effects";
+import { toast } from "react-toastify";
+
 import {
   createEventRequest,
   createEventSuccess,
@@ -13,6 +15,16 @@ import {
 
 import commonApi from "../api";
 
+
+/* =================================
+   HELPER → extract backend message
+================================= */
+const getErrorMessage = (error) =>
+  error?.response?.data?.message ||
+  error?.message ||
+  "Something went wrong";
+
+
 /* =========================
    CREATE EVENT
 ========================= */
@@ -24,7 +36,6 @@ function* createEventSaga(action) {
       body: action.payload
     });
 
-    // 👇 store only created event
     yield put(createEventSuccess(res));
 
     yield put(
@@ -34,7 +45,11 @@ function* createEventSaga(action) {
     );
 
   } catch (error) {
-    yield put(createEventFailure(error.message));
+    const message = getErrorMessage(error);
+
+    yield put(createEventFailure(message));
+
+    toast.error(message); // 🔥 shows plan limit message
   }
 }
 
@@ -56,7 +71,11 @@ function* getEventsSaga(action) {
     yield put(getEventsSuccess(res));
 
   } catch (error) {
-    yield put(getEventsFailure(error.message));
+    const message = getErrorMessage(error);
+
+    yield put(getEventsFailure(message));
+
+    toast.error(message);
   }
 }
 
@@ -76,11 +95,16 @@ function* updateEventSaga(action) {
 
     yield put(updateEventSuccess(res));
 
-    // Refresh list after update
     yield put(getEventsRequest({ vendorId: data.get("vendorId") }));
 
+    toast.success("Event updated successfully");
+
   } catch (error) {
-    yield put(updateEventFailure(error.message));
+    const message = getErrorMessage(error);
+
+    yield put(updateEventFailure(message));
+
+    toast.error(message);
   }
 }
 

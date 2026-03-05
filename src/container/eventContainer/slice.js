@@ -22,6 +22,11 @@ const eventSlice = createSlice({
     createEventFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
+
+      // optional: detect plan limit
+      if (action.payload?.toLowerCase().includes("plan")) {
+        state.subscriptionError = action.payload;
+      }
     },
 
     clearCreatedEvent: (state) => {

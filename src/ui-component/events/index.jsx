@@ -25,6 +25,7 @@ import {
 import "./events.css";
 
 export default function Events() {
+  const subscription = useSelector((state) => state.subscription?.data);
   const [eventTypes, setEventTypes] = useState([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -150,20 +151,54 @@ export default function Events() {
     }
   };
 
+  const PLAN_LIMITS = {
+    basic: 3,
+    professional: 10,
+    enterprise: -1
+  };
+
+  const currentPlan = subscription?.plan || "basic";
+  const maxEvents = PLAN_LIMITS[currentPlan];
+  const eventCount = events.length;
+
+  const limitReached =
+    maxEvents !== -1 && eventCount >= maxEvents;
+
   return (
     <Box className="events-page">
 
       <Box className="events-header">
         <Typography variant="h4">Events</Typography>
-        <Button
-          variant="contained"
-          onClick={() => {
-            resetForm();
-            setOpenDrawer(true);
-          }}
-        >
-          Create Event
-        </Button>
+        <Box display="flex" gap={2} alignItems="center">
+
+          <Typography>
+            {maxEvents === -1
+              ? "Unlimited events"
+              : `${eventCount} / ${maxEvents} events used`}
+          </Typography>
+
+          <Button
+            variant="contained"
+            disabled={limitReached}
+            onClick={() => {
+              resetForm();
+              setOpenDrawer(true);
+            }}
+          >
+            {limitReached ? "Upgrade to add more" : "Create Event"}
+          </Button>
+
+          {limitReached && (
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => navigate("/subscription")}
+            >
+              Upgrade Plan
+            </Button>
+          )}
+
+        </Box>
       </Box>
 
       {events.length === 0 && (
