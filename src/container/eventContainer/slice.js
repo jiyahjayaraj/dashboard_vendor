@@ -5,7 +5,8 @@ const eventSlice = createSlice({
   initialState: {
     loading: false,
     error: null,
-    events: [],         // store events
+    events: [],
+    createdEvent: null   // ✅ added
   },
   reducers: {
     /* CREATE EVENT */
@@ -13,19 +14,25 @@ const eventSlice = createSlice({
       state.loading = true;
       state.error = null;
     },
-    createEventSuccess: (state) => {
+    createEventSuccess: (state, action) => {
       state.loading = false;
+      state.createdEvent =
+        action.payload?.data || action.payload; // ✅ store event
     },
     createEventFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
 
+    clearCreatedEvent: (state) => {
+      state.createdEvent = null; // ✅ reset after navigation
+    },
+
     /* GET EVENTS */
     getEventsRequest: (state, action) => {
       state.loading = true;
       state.error = null;
-      state.vendorId = action.payload?.vendorId; // optional, for debugging
+      state.vendorId = action.payload?.vendorId;
     },
     getEventsSuccess: (state, action) => {
       state.loading = false;
@@ -39,16 +46,17 @@ const eventSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    updateEventRequest: (state) => {
-  state.loading = true;
-},
-updateEventSuccess: (state, action) => {
-  state.loading = false;
-},
-updateEventFailure: (state) => {
-  state.loading = false;
-},
 
+    /* UPDATE EVENT */
+    updateEventRequest: (state) => {
+      state.loading = true;
+    },
+    updateEventSuccess: (state) => {
+      state.loading = false;
+    },
+    updateEventFailure: (state) => {
+      state.loading = false;
+    },
   },
 });
 
@@ -61,7 +69,8 @@ export const {
   getEventsFailure,
   updateEventRequest,
   updateEventSuccess,
-  updateEventFailure
+  updateEventFailure,
+  clearCreatedEvent
 } = eventSlice.actions;
 
 export default eventSlice.reducer;

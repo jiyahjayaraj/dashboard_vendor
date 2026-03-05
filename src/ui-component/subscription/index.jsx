@@ -55,9 +55,20 @@
     const [paymentMethod, setPaymentMethod] = useState('');
     const [processingPayment, setProcessingPayment] = useState(false);
     const dispatch = useDispatch();
+
+     useEffect(() => {
+      dispatch(getSubscription());
+    }, []);
+
     const { data, loading, error } = useSelector(
       (state) => state.subscription
     );
+
+    const subdata = useSelector(
+      (state) => state.subscription
+    );
+
+    console.log("🔍 SUBSCRIPTION:", subdata);
   useEffect(() => {
     console.log("🔍 SUBSCRIPTION SLICE DATA:", data);
     console.log("🔍 PLAN FIELD:", data?.plan);
@@ -67,9 +78,7 @@
     const [selectedPlan, setSelectedPlan] = useState(null);
     const [renewalDate, setRenewalDate] = useState('');
 
-    useEffect(() => {
-      dispatch(getSubscription());
-    }, [dispatch]);
+   
 
     const handleUpgradeClick = (plan) => {
       setSelectedPlan(plan);
