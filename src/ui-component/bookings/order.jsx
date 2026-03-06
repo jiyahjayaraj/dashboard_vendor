@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from "react";
 import "./order.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,11 +15,22 @@ const Order = () => {
 
   // Fetch Orders from saga
   useEffect(() => {
+    console.log("Dispatching getVendorOrdersRequest...");
     dispatch(getVendorOrdersRequest());
   }, [dispatch]);
 
+  // Debug Redux state
+  useEffect(() => {
+    console.log("Orders from Redux:", orders);
+    console.log("Loading:", loading);
+    console.log("Error:", error);
+  }, [orders, loading, error]);
+
   // ✅ Filter Orders by search + status
   const filteredOrders = orders.filter((order) => {
+
+    console.log("Checking Order:", order);
+
     const customerName = order.userId?.name || "";
 
     const matchesSearch = customerName
@@ -34,6 +43,8 @@ const Order = () => {
 
     return matchesSearch && matchesStatus;
   });
+
+  console.log("Filtered Orders:", filteredOrders);
 
   return (
     <div className="order-container">
@@ -89,13 +100,14 @@ const Order = () => {
                 filteredOrders.map((order, index) => (
                   <tr key={order._id}>
                     <td>{index + 1}</td>
+
                     <td>{order.userId?.name}</td>
 
                     <td>
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
 
-                    <td>{order.eventId?.title}</td>
+                    <td>{order.eventId?.eventName}</td>
 
                     <td>₹ {order.totalAmount}</td>
 
@@ -120,6 +132,5 @@ const Order = () => {
     </div>
   );
 };
-
 
 export default Order;
