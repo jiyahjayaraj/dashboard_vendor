@@ -16,23 +16,23 @@ const subscriptionSlice = createSlice({
     },
     getSubscriptionSuccess: (state, action) => {
       state.loading = false;
-      state.data = action.payload; // ✅ DIRECT OBJECT
+      state.data = action.payload;
     },
     getSubscriptionFail: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
 
-    /* ========= UPDATE ========= */
-    updateSubscription: (state) => {
+    /* ========= UPGRADE ========= */
+    upgradeSubscription: (state, action) => {
       state.updating = true;
       state.error = null;
     },
-    updateSubscriptionSuccess: (state, action) => {
+    upgradeSubscriptionSuccess: (state, action) => {
       state.updating = false;
       state.data = action.payload;
     },
-    updateSubscriptionFail: (state, action) => {
+    upgradeSubscriptionFail: (state, action) => {
       state.updating = false;
       state.error = action.payload;
     },
@@ -57,9 +57,9 @@ export const {
   getSubscription,
   getSubscriptionSuccess,
   getSubscriptionFail,
-  updateSubscription,
-  updateSubscriptionSuccess,
-  updateSubscriptionFail,
+  upgradeSubscription,
+  upgradeSubscriptionSuccess,
+  upgradeSubscriptionFail,
   cancelSubscription,
   cancelSubscriptionSuccess,
   cancelSubscriptionFail
