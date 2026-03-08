@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { getSubscription } from "container/subscription/slice";
 
 import {
   createEventRequest,
@@ -19,7 +20,10 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent
 } from "@mui/material";
 
 import "./events.css";
@@ -29,9 +33,7 @@ export default function Events() {
   const [eventTypes, setEventTypes] = useState([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const createdEvent = useSelector(
-    (state) => state.event?.createdEvent
-  );
+  const createdEvent = useSelector((state) => state.event?.createdEvent);
 
   const events = useSelector((state) => state.event?.events || []);
   const user = useSelector((state) => state?.login?.userData || {});
@@ -39,7 +41,6 @@ export default function Events() {
 
   const [openDrawer, setOpenDrawer] = useState(false);
   const [viewOpen, setViewOpen] = useState(false);
-  const [ticketOpen, setTicketOpen] = useState(false);
 
   const [preview, setPreview] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -50,7 +51,7 @@ export default function Events() {
   const [form, setForm] = useState({
     eventName: "",
     description: "",
-    eventType: "", // ✅ FIXED
+    eventType: "",
     city: "",
     eventLocation: "",
     eventDate: "",
@@ -62,15 +63,15 @@ export default function Events() {
     earlyDeadline: "",
     bannerImage: null
   });
-  useEffect(() => {
 
+  useEffect(() => {
     fetch("http://localhost:5000/api/eventtypes")
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         setEventTypes(data.data || []);
       });
-
   }, []);
+
   useEffect(() => {
     if (vendorId) {
       dispatch(getEventsRequest({ vendorId }));
@@ -78,17 +79,21 @@ export default function Events() {
   }, [dispatch, vendorId]);
 
   useEffect(() => {
-    console.log("CREATED EVENT:", createdEvent);
-
     if (createdEvent && !isEdit) {
-      navigate('/tickets');
-      dispatch(clearCreatedEvent()); // prevent repeated navigation
+      navigate("/tickets");
+      dispatch(clearCreatedEvent());
     }
   }, [createdEvent, navigate, isEdit, dispatch]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+
+  useEffect(() => {
+    if (vendorId) {
+      dispatch(getSubscription({ vendorId }));
+    }
+  }, [vendorId, dispatch]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -128,8 +133,6 @@ export default function Events() {
       }
     });
 
-    formData.append("vendorId", vendorId);
-
     if (isEdit) {
       dispatch(updateEventRequest({ id: editId, data: formData }));
     } else {
@@ -137,7 +140,6 @@ export default function Events() {
     }
 
     setOpenDrawer(false);
-    resetForm();
   };
 
   const BASE_URL = "http://localhost:5000";
@@ -157,7 +159,7 @@ export default function Events() {
     enterprise: -1
   };
 
-  const currentPlan = subscription?.plan || "basic";
+  const currentPlan = subscription?.plan?.toLowerCase() || "basic";
   const maxEvents = PLAN_LIMITS[currentPlan];
   const eventCount = events.length;
 
@@ -169,6 +171,7 @@ export default function Events() {
 
       <Box className="events-header">
         <Typography variant="h4">Events</Typography>
+
         <Box display="flex" gap={2} alignItems="center">
 
           <Typography>
@@ -227,9 +230,11 @@ export default function Events() {
                 <Typography className="event-title">
                   {e.eventName}
                 </Typography>
+
                 <Typography className="event-location">
                   {e.eventLocation || "N/A"}
                 </Typography>
+
                 <Typography className="event-date">
                   {e.eventDate
                     ? new Date(e.eventDate).toDateString()
@@ -238,6 +243,7 @@ export default function Events() {
               </Box>
 
               <Box className="event-actions">
+
                 <Button
                   size="small"
                   onClick={() => {
@@ -254,14 +260,18 @@ export default function Events() {
                     setForm({
                       ...e,
                       eventType: e.eventType || "",
-                      eventDate: e.eventDate?.split("T")[0],
+                      eventDate: e.eventDate
+                        ? new Date(e.eventDate).toISOString().split("T")[0]
+                        : "",
                       bannerImage: null
                     });
+
                     setPreview(
                       e.bannerImage
                         ? `${BASE_URL}${e.bannerImage}`
                         : null
                     );
+
                     setEditId(e._id);
                     setIsEdit(true);
                     setOpenDrawer(true);
@@ -269,7 +279,6 @@ export default function Events() {
                 >
                   Edit
                 </Button>
-
 
               </Box>
 
@@ -285,14 +294,16 @@ export default function Events() {
         onClose={() => setOpenDrawer(false)}
         {...drawerStyle}
       >
+
         <Box className="event-drawer">
 
           <Typography className="drawer-title">
             {isEdit ? "Update Event" : "Create Event"}
           </Typography>
 
-          {/* ================= BASIC INFO ================= */}
+          {/* BASIC INFO */}
           <div className="drawer-card">
+
             <Typography className="section-heading">
               Basic Information
             </Typography>
@@ -317,6 +328,7 @@ export default function Events() {
             />
 
             <FormControl fullWidth sx={{ mt: 2 }}>
+
               <InputLabel>Event Type *</InputLabel>
 
               <Select
@@ -325,9 +337,7 @@ export default function Events() {
                 onChange={handleChange}
                 label="Event Type *"
               >
-                <MenuItem value="">
-                  Select Event Type
-                </MenuItem>
+                <MenuItem value="">Select Event Type</MenuItem>
 
                 {eventTypes.map((type) => (
                   <MenuItem key={type._id} value={type._id}>
@@ -338,35 +348,36 @@ export default function Events() {
               </Select>
 
             </FormControl>
+
           </div>
 
-          {/* ================= EVENT BANNER ================= */}
+          {/* BANNER */}
           <div className="drawer-card">
+
             <Typography className="section-heading">
               Event Banner
-            </Typography>
-            <Typography className="section-sub">
-              Upload an attractive banner image for your event
             </Typography>
 
             <div className="upload-box">
               <input type="file" accept="image/*" onChange={handleFileChange} />
+
               {preview && (
                 <img src={preview} alt="preview" className="preview-img" />
               )}
+
             </div>
+
           </div>
 
-          {/* ================= LOCATION ================= */}
+          {/* LOCATION */}
           <div className="drawer-card">
+
             <Typography className="section-heading">
               Location & Venue
             </Typography>
-            <Typography className="section-sub">
-              Where will your event take place?
-            </Typography>
 
             <Grid container spacing={2} sx={{ mt: 1 }}>
+
               <Grid item xs={6}>
                 <TextField
                   fullWidth
@@ -376,6 +387,7 @@ export default function Events() {
                   onChange={handleChange}
                 />
               </Grid>
+
               <Grid item xs={6}>
                 <TextField
                   fullWidth
@@ -385,98 +397,253 @@ export default function Events() {
                   onChange={handleChange}
                 />
               </Grid>
+
             </Grid>
+
           </div>
 
-          {/* ================= DATE & TIME ================= */}
+          {/* DATE TIME */}
+          {/* DATE TIME */}
+          {/* DATE TIME */}
           <div className="drawer-card">
+
             <Typography className="section-heading">
               Date & Time
             </Typography>
-            <Typography className="section-sub">
-              When will your event take place?
-            </Typography>
 
-            <Grid container spacing={2} sx={{ mt: 1 }}>
+            {/* Warning when creating */}
+            {!isEdit && (
+              <Typography
+                sx={{
+                  background: "#fff3cd",
+                  color: "#856404",
+                  padding: "10px",
+                  borderRadius: "6px",
+                  fontSize: "14px",
+                  marginBottom: "12px"
+                }}
+              >
+                ⚠️ Once the event is created, the event date cannot be changed later.
+              </Typography>
+            )}
+
+            {/* Warning when editing */}
+            {isEdit && (
+              <Typography
+                sx={{
+                  background: "#fdecea",
+                  color: "#b71c1c",
+                  padding: "10px",
+                  borderRadius: "6px",
+                  fontSize: "14px",
+                  marginBottom: "12px"
+                }}
+              >
+                🔒 Event date cannot be edited after creation. You can still adjust the event time.
+              </Typography>
+            )}
+
+            <Grid container spacing={2}>
+
+              {/* DATE LOCKED */}
               <Grid item xs={4}>
                 <TextField
                   fullWidth
                   type="date"
                   name="eventDate"
-                  label="Event Date *"
+                  label="Event Date"
                   InputLabelProps={{ shrink: true }}
                   value={form.eventDate}
                   onChange={handleChange}
+                  disabled={isEdit}   // 🔒 only date locked
                 />
               </Grid>
+
+              {/* START TIME EDITABLE */}
               <Grid item xs={4}>
                 <TextField
                   fullWidth
                   type="time"
                   name="startTime"
-                  label="Start Time *"
+                  label="Start Time"
                   InputLabelProps={{ shrink: true }}
                   value={form.startTime}
                   onChange={handleChange}
                 />
               </Grid>
+
+              {/* END TIME EDITABLE */}
               <Grid item xs={4}>
                 <TextField
                   fullWidth
                   type="time"
                   name="endTime"
-                  label="End Time *"
+                  label="End Time"
                   InputLabelProps={{ shrink: true }}
                   value={form.endTime}
                   onChange={handleChange}
                 />
               </Grid>
+
             </Grid>
+
           </div>
 
-          {/* ================= TICKETING ================= */}
-
-
-          {/* ================= ACTIONS ================= */}
           <Box className="drawer-actions">
-            <Button variant="outlined" className="draft-btn">
-              Save as Draft
-            </Button>
+
             <Button
               variant="contained"
               onClick={handleSubmit}
-              disabled={!vendorId}
+              disabled={!vendorId || !form.eventName}
             >
               {isEdit ? "Update Event" : "Create Event"}
             </Button>
+
           </Box>
 
         </Box>
+
       </Drawer>
 
+      <Dialog
+        open={viewOpen}
+        onClose={() => setViewOpen(false)}
+        maxWidth="md"
+        fullWidth
+        BackdropProps={{
+          sx: {
+            backdropFilter: "blur(2px)",
+            backgroundColor: "rgba(0,0,0,0.6)"
+          }
+        }}
+      >
 
-      {/* VIEW DRAWER */}
-      <Drawer anchor="right" open={viewOpen} onClose={() => setViewOpen(false)} {...drawerStyle}>
-        {selectedEvent && (
-          <Box className="event-drawer">
-            <Typography className="drawer-title">Event Details</Typography>
-            <img
-              src={selectedEvent.bannerImage ? `${BASE_URL}${selectedEvent.bannerImage}` : "/placeholder.jpg"}
-              alt="banner"
-              className="view-banner"
-            />
+        <DialogTitle
+          sx={{
+            background: "#0f0f0f",
+            color: "#ff7a00",
+            fontWeight: 600
+          }}
+        >
+          Event Details
+        </DialogTitle>
 
-            <div className="view-section"><div className="view-label">Event Name</div><div className="view-value">{selectedEvent.eventName}</div></div>
-            <div className="view-section"><div className="view-label">Description</div><div className="view-value">{selectedEvent.description}</div></div>
-            <div className="view-section"><div className="view-label">Location</div><div className="view-value">{selectedEvent.city} - {selectedEvent.eventLocation}</div></div>
-            <div className="view-section"><div className="view-label">Date</div><div className="view-value">{new Date(selectedEvent.eventDate).toDateString()}</div></div>
-            <div className="view-section"><div className="view-label">Time</div><div className="view-value">{selectedEvent.startTime} - {selectedEvent.endTime}</div></div>
-          </Box>
-        )}
-      </Drawer>
+        <DialogContent
+          sx={{
+            background: "#0f0f0f",
+            color: "#ffffff"
+          }}
+        >
 
-      {/* MANAGE TICKETS DRAWER */}
+          {selectedEvent && (
+            <Box>
 
+              {/* Banner */}
+              {selectedEvent.bannerImage && (
+                <Box mb={3}>
+                  <img
+                    src={`${BASE_URL}${selectedEvent.bannerImage}`}
+                    alt="banner"
+                    style={{
+                      width: "100%",
+                      borderRadius: "10px",
+                      maxHeight: "250px",
+                      objectFit: "cover"
+                    }}
+                  />
+                </Box>
+              )}
+
+              {/* Event Name */}
+              <Typography
+                variant="h5"
+                sx={{ fontWeight: 600, mb: 2 }}
+              >
+                {selectedEvent.eventName}
+              </Typography>
+
+              {/* Description */}
+              <Typography
+                sx={{ color: "text.secondary", mb: 3 }}
+              >
+                {selectedEvent.description}
+              </Typography>
+
+              {/* Details Grid */}
+              <Grid container spacing={3}>
+
+                <Grid item xs={6}>
+                  <Typography variant="caption" color="text.secondary">
+                    Event Type
+                  </Typography>
+
+                  <Typography sx={{ fontWeight: 500 }}>
+                    {
+                      eventTypes.find(
+                        (t) => t._id === selectedEvent.eventType
+                      )?.name || "N/A"
+                    }
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={6}>
+                  <Typography variant="caption" color="text.secondary">
+                    City
+                  </Typography>
+
+                  <Typography sx={{ fontWeight: 500 }}>
+                    {selectedEvent.city}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={6}>
+                  <Typography variant="caption" color="text.secondary">
+                    Venue
+                  </Typography>
+
+                  <Typography sx={{ fontWeight: 500 }}>
+                    {selectedEvent.eventLocation}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={6}>
+                  <Typography variant="caption" color="text.secondary">
+                    Date
+                  </Typography>
+
+                  <Typography sx={{ fontWeight: 500 }}>
+                    {new Date(selectedEvent.eventDate).toDateString()}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={6}>
+                  <Typography variant="caption" color="text.secondary">
+                    Start Time
+                  </Typography>
+
+                  <Typography sx={{ fontWeight: 500 }}>
+                    {selectedEvent.startTime}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={6}>
+                  <Typography variant="caption" color="text.secondary">
+                    End Time
+                  </Typography>
+
+                  <Typography sx={{ fontWeight: 500 }}>
+                    {selectedEvent.endTime}
+                  </Typography>
+                </Grid>
+
+              </Grid>
+
+            </Box>
+          )}
+
+        </DialogContent>
+
+      </Dialog>
 
     </Box>
   );

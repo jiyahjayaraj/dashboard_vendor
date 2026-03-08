@@ -79,15 +79,13 @@ function* updateProfile(action) {
     const params = {
       api: `${appConfig.ip}/api/updateProfile`,
       method: "PUT",
-      body: action.payload,  
-      credentials: 'include'
+      body: action.payload, // already FormData
+      credentials: "include"
     };
 
     yield call(commonApi, params);
 
-    yield call(toast.success, "Profile updated successfully", {
-      autoClose: 3000
-    });
+    yield call(toast.success, "Profile updated successfully");
 
     yield put(actionType.userMe());
     yield put(actionType.updateProfileSuccess());

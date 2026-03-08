@@ -29,7 +29,7 @@ const MainRoutes = {
   children: [
     {
       path: '',
-      element: <Navigate to="dashboard" replace />
+      element: <Navigate to="login" replace />
     },
     {
       path: 'dashboard',

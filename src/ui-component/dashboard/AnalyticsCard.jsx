@@ -1,94 +1,121 @@
-import React from 'react';
-import { Grid, Box } from '@mui/material';
-import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { blueGrey } from '@mui/material/colors';
-import { TagsOutlined, DollarOutlined, CalendarOutlined , EyeOutlined  } from '@ant-design/icons';
-import Card from './card';
-// import { DetailCard } from './DetailCard';
-import { ClockCircleOutlined } from '@ant-design/icons';
+import React from "react";
+import { Grid } from "@mui/material";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { getVendorOrdersRequest } from "container/orderContainer/slice";
+import { getEventsRequest } from "container/eventContainer/slice";
+import { getVendorFeedbacks } from "container/RatingContainer/slice";
 
+import {
+  CalendarOutlined,
+  DollarOutlined,
+  EyeOutlined,
+  ClockCircleOutlined
+} from "@ant-design/icons";
 
+import Card from "./card";
 
 const AnalyticsCard = () => {
-  const facilityList = useSelector((state) => state.facility?.list || []);
-  const issueList = useSelector((state) => state.reportIssue?.list || []);
-  const feedbackList = useSelector((state) => state.rating?.list || []);
-  const usersList = useSelector((state) => state.user?.list || []);
-  const dashCount = useSelector((state) => state?.dashboard?.dashCount);
-  const draftFacilities = useSelector((state) => state.facility?.draftList || []);
+  const user = useSelector((state) => state?.login?.userData || {});
+  const vendorId = user?._id;
 
-  const draftCount = draftFacilities.length;
+  const events = useSelector((state) => state.event?.events || []);
+  const ratings = useSelector((state) => state.rating?.list || []);
+  const orders = useSelector((state) => state.order?.orders || []);
 
-  console.log('FacilityList in Dashboar = ', facilityList);
+  const dispatch = useDispatch();
 
-  const counts = {
-    facilities: useSelector((state) => state.facility?.listCount || 0),
-    issues: useSelector((state) => state.reportIssue?.listCount || 0),
-    feedback: useSelector((state) => state?.rating?.listCount || 0),
-    users: useSelector((state) => state.user?.listCount || 0)
-  };
+useEffect(() => {
+  if (vendorId) {
+    dispatch(getVendorOrdersRequest({ vendorId }));
+    dispatch(getEventsRequest({ vendorId }));
+    dispatch(getVendorFeedbacks({ vendorId }));
+  }
+}, [dispatch, vendorId]);
 
+  /* ====== CALCULATIONS ====== */
+
+  const totalEvents = events.length;
+
+  const activeEvents = events.filter(
+    (e) => new Date(e.eventDate) >= new Date()
+  ).length;
+
+  const totalRevenue = orders.reduce(
+    (sum, order) => sum + (order.totalAmount || 0),
+    0
+  );
+
+  const averageRating =
+    ratings.length > 0
+      ? (
+        ratings.reduce((sum, r) => sum + (r.rating || 0), 0) /
+        ratings.length
+      ).toFixed(1)
+      : 0;
 
   return (
     <Grid container item xs={12} spacing={2.5}>
-  <Grid item xs={12}>
-    <Grid container spacing={2.5}>
-      
-      <Grid item xs={12} sm={6} md={3}>
-        <Link to="/userManagment" style={{ textDecoration: 'none' }}>
-          <Card
-            title="Total Ticket Sold"
-            count={12000}
-            color="#d0d7e4"
-            bgTheme="#000000"
-            icon={<TagsOutlined />}
-          />
-        </Link>
-      </Grid>
+      <Grid item xs={12}>
+        <Grid container spacing={2.5}>
 
-      <Grid item xs={12} sm={6} md={3}>
-        <Link to="/facility" style={{ textDecoration: 'none' }}>
-          <Card
-            title="Total Revenue"
-            count={10}
-            color="#d0d7e4"
-            bgTheme="#000000"
-            icon={<DollarOutlined />}
-          />
-        </Link>
-      </Grid>
+          {/* TOTAL EVENTS */}
+          <Grid item xs={12} sm={6} md={3}>
+            <Link to="/events" style={{ textDecoration: "none" }}>
+              <Card
+                title="Total Events"
+                count={totalEvents}
+                color="#d0d7e4"
+                bgTheme="#000000"
+                icon={<CalendarOutlined />}
+              />
+            </Link>
+          </Grid>
 
-      <Grid item xs={12} sm={6} md={3}>
-        <Link to="/reportedIssues" style={{ textDecoration: 'none' }}>
-          <Card
-            title="Active Events"
-            count={11}
-            color="#d0d7e4"
-            bgTheme="#000000"
-            icon={<CalendarOutlined />}
-          />
-        </Link>
-      </Grid>
+          {/* TOTAL REVENUE */}
+          <Grid item xs={12} sm={6} md={3}>
+            <Link to="/tickets" style={{ textDecoration: "none" }}>
+              <Card
+                title="Total Revenue"
+                count={`₹${totalRevenue}`}
+                color="#d0d7e4"
+                bgTheme="#000000"
+                icon={<DollarOutlined />}
+              />
+            </Link>
+          </Grid>
 
-      <Grid item xs={12} sm={6} md={3}>
-        <Link to="/rating" style={{ textDecoration: 'none' }}>
-          <Card
-            title="Total Views"
-            count={200}
-            color="#d0d7e4"
-            bgTheme="#000000"
-            icon={<EyeOutlined />}
-          />
-        </Link>
-      </Grid>
+          {/* ACTIVE EVENTS */}
+          <Grid item xs={12} sm={6} md={3}>
+            <Link to="/events" style={{ textDecoration: "none" }}>
+              <Card
+                title="Active Events"
+                count={activeEvents}
+                color="#d0d7e4"
+                bgTheme="#000000"
+                icon={<ClockCircleOutlined />}
+              />
+            </Link>
+          </Grid>
 
+          {/* AVERAGE RATING */}
+          <Grid item xs={12} sm={6} md={3}>
+            <Link to="/rating" style={{ textDecoration: "none" }}>
+              <Card
+                title="Average Rating"
+                count={averageRating}
+                color="#d0d7e4"
+                bgTheme="#000000"
+                icon={<EyeOutlined />}
+              />
+            </Link>
+          </Grid>
+
+        </Grid>
+      </Grid>
     </Grid>
-  </Grid>
-</Grid>
-
-
-
   );
 };
 

@@ -3,6 +3,20 @@ import "./order.css";
 import { useDispatch, useSelector } from "react-redux";
 import { getVendorOrdersRequest } from "../../container/orderContainer/slice";
 
+import {
+  Box,
+  Typography,
+  TextField,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  CircularProgress
+} from "@mui/material";
+
 const Order = () => {
   const dispatch = useDispatch();
 
@@ -11,125 +25,108 @@ const Order = () => {
   );
 
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("");
 
-  // Fetch Orders from saga
+  // Fetch orders
   useEffect(() => {
-    console.log("Dispatching getVendorOrdersRequest...");
     dispatch(getVendorOrdersRequest());
   }, [dispatch]);
 
-  // Debug Redux state
-  useEffect(() => {
-    console.log("Orders from Redux:", orders);
-    console.log("Loading:", loading);
-    console.log("Error:", error);
-  }, [orders, loading, error]);
-
-  // ✅ Filter Orders by search + status
+  // Filter orders
   const filteredOrders = orders.filter((order) => {
-
-    console.log("Checking Order:", order);
-
     const customerName = order.userId?.name || "";
-
-    const matchesSearch = customerName
-      .toLowerCase()
-      .includes(search.toLowerCase());
-
-    const matchesStatus = status
-      ? order.paymentStatus === status
-      : true;
-
-    return matchesSearch && matchesStatus;
+    return customerName.toLowerCase().includes(search.toLowerCase());
   });
 
-  console.log("Filtered Orders:", filteredOrders);
-
   return (
-    <div className="order-container">
+    <Box className="order-container">
+
       {/* Header */}
-      <div className="order-header">
-        <h2>Orders</h2>
-        <p>Manage and track customer bookings</p>
-      </div>
+      <Box className="order-header">
+        <Typography variant="h5">
+          Orders
+        </Typography>
 
-      {/* Controls */}
-      <div className="order-controls">
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-        >
-          <option value="">All Status</option>
-          <option value="paid">Paid</option>
-          <option value="pending">Pending</option>
-          <option value="failed">Failed</option>
-        </select>
+        <Typography variant="body2">
+          Manage and track customer bookings
+        </Typography>
+      </Box>
 
-        <input
-          type="text"
+      {/* Search */}
+      <Box className="order-controls">
+        <TextField
+          size="small"
           placeholder="Search by customer..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          variant="outlined"
         />
-      </div>
+      </Box>
 
       {/* Table */}
-      <div className="order-table">
+      <Paper className="order-table" elevation={0}>
+
         {loading ? (
-          <p style={{ padding: "20px" }}>Loading orders...</p>
+          <Box sx={{ padding: "20px", textAlign: "center" }}>
+            <CircularProgress />
+          </Box>
         ) : error ? (
-          <p style={{ padding: "20px", color: "red" }}>
+          <Typography sx={{ padding: "20px", color: "red" }}>
             Failed to load orders
-          </p>
+          </Typography>
         ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Customer</th>
-                <th>Date</th>
-                <th>Service</th>
-                <th>Amount</th>
-                <th>Status</th>
-              </tr>
-            </thead>
+          <TableContainer>
+            <Table>
 
-            <tbody>
-              {filteredOrders.length > 0 ? (
-                filteredOrders.map((order, index) => (
-                  <tr key={order._id}>
-                    <td>{index + 1}</td>
+              <TableHead>
+                <TableRow>
+                  <TableCell>#</TableCell>
+                  <TableCell>Customer</TableCell>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Event</TableCell>
+                  <TableCell>Amount</TableCell>
+                </TableRow>
+              </TableHead>
 
-                    <td>{order.userId?.name}</td>
+              <TableBody>
+                {filteredOrders.length > 0 ? (
+                  filteredOrders.map((order, index) => (
+                    <TableRow key={order._id} hover>
 
-                    <td>
-                      {new Date(order.createdAt).toLocaleDateString()}
-                    </td>
+                      <TableCell>{index + 1}</TableCell>
 
-                    <td>{order.eventId?.eventName}</td>
+                      <TableCell>
+                        {order.userId?.name || "Unknown"}
+                      </TableCell>
 
-                    <td>₹ {order.totalAmount}</td>
+                      <TableCell>
+                        {new Date(order.createdAt).toLocaleDateString()}
+                      </TableCell>
 
-                    <td>
-                      <span className={`status ${order.paymentStatus}`}>
-                        {order.paymentStatus}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="6" style={{ textAlign: "center" }}>
-                    No Orders Found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                      <TableCell>
+                        {order.eventId?.eventName}
+                      </TableCell>
+
+                      <TableCell>
+                        ₹ {order.totalAmount}
+                      </TableCell>
+
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center">
+                      No Orders Found
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+
+            </Table>
+          </TableContainer>
         )}
-      </div>
-    </div>
+      </Paper>
+
+    </Box>
   );
 };
 

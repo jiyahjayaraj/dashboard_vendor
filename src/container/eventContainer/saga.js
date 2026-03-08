@@ -37,19 +37,13 @@ function* createEventSaga(action) {
     });
 
     yield put(createEventSuccess(res));
-
-    yield put(
-      getEventsRequest({
-        vendorId: action.payload.get("vendorId")
-      })
-    );
-
+    yield put(getEventsRequest({ vendorId: res.event.vendorId }));
   } catch (error) {
     const message = getErrorMessage(error);
 
     yield put(createEventFailure(message));
 
-    toast.error(message); // 🔥 shows plan limit message
+    toast.error(message); 
   }
 }
 

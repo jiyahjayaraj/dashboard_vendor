@@ -113,7 +113,7 @@ const Subscription = () => {
   };
 
   const currentPlan =
-    data?.plan?.toString().trim().toLowerCase() || "";
+    data?.plan?.toLowerCase() ?? "basic";
 
   if (loading) {
     return (
@@ -123,7 +123,9 @@ const Subscription = () => {
       </Box>
     );
   }
-
+  const price = data?.price ?? 0;
+  const status = data?.status ?? "active";
+  const renewalDate = data?.renewalDate ?? null;
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h3" gutterBottom>
@@ -143,7 +145,8 @@ const Subscription = () => {
       )}
 
       {/* ================= CURRENT PLAN ================= */}
-      {!loading && data && (
+      {!loading && (
+
         <Paper
           sx={{
             p: 3,
@@ -161,19 +164,19 @@ const Subscription = () => {
 
               <Typography variant="body2" sx={{ mt: 1 }}>
                 Renews on:{' '}
-                {data?.renewalDate
-                  ? new Date(data.renewalDate).toDateString()
+                {renewalDate
+                  ? new Date(renewalDate).toDateString()
                   : 'N/A'}
               </Typography>
 
               <Chip
                 label={
-                  data.status === 'active'
+                  status === 'active'
                     ? 'Active Plan'
                     : 'Cancelled'
                 }
                 color={
-                  data.status === 'active'
+                  status === 'active'
                     ? 'success'
                     : 'error'
                 }
@@ -183,10 +186,10 @@ const Subscription = () => {
 
             <Grid item>
               <Typography variant="h4" sx={{ mb: 2 }}>
-                ₹{data.price}/{currentPlan === 'enterprise' ? 'year' : 'month'}
+                ₹{price}/{currentPlan === 'enterprise' ? 'year' : 'month'}
               </Typography>
 
-              {data.status === 'active' && (
+              {status === 'active' && (
                 <Button
                   variant="contained"
                   color="error"
