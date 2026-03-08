@@ -2,6 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getSubscription } from "container/subscription/slice";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import dayjs from "dayjs";
 
 import {
   createEventRequest,
@@ -402,9 +407,6 @@ export default function Events() {
 
           </div>
 
-          {/* DATE TIME */}
-          {/* DATE TIME */}
-          {/* DATE TIME */}
           <div className="drawer-card">
 
             <Typography className="section-heading">
@@ -439,54 +441,73 @@ export default function Events() {
                   marginBottom: "12px"
                 }}
               >
-                🔒 Event date cannot be edited after creation. You can still adjust the event time.
+                Event date cannot be edited after creation. You can still adjust the event time.
               </Typography>
             )}
 
-            <Grid container spacing={2}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Grid container spacing={2}>
 
-              {/* DATE LOCKED */}
-              <Grid item xs={4}>
-                <TextField
-                  fullWidth
-                  type="date"
-                  name="eventDate"
-                  label="Event Date"
-                  InputLabelProps={{ shrink: true }}
-                  value={form.eventDate}
-                  onChange={handleChange}
-                  disabled={isEdit}   // 🔒 only date locked
-                />
+                {/* DATE LOCKED */}
+                <Grid item xs={4}>
+                  <DatePicker
+                    label="Event Date"
+                    value={form.eventDate ? dayjs(form.eventDate) : null}
+                    onChange={(newValue) =>
+                      setForm({ ...form, eventDate: newValue?.format("YYYY-MM-DD") })
+                    }
+                    disabled={isEdit}
+                    sx={{
+                      "& .MuiInputBase-root": {
+                        background: "#1c1c1c",
+                        color: "#fff"
+                      }
+                    }}
+                  />
+                </Grid>
+
+                {/* START TIME EDITABLE */}
+                <Grid item xs={4}>
+                  <TimePicker
+                    label="Start Time"
+                    value={form.startTime ? dayjs(`2024-01-01T${form.startTime}`) : null}
+                    onChange={(newValue) =>
+                      setForm({
+                        ...form,
+                        startTime: newValue?.format("HH:mm")
+                      })
+                    }
+                    sx={{
+                      "& .MuiInputBase-root": {
+                        background: "#1c1c1c",
+                        color: "#fff"
+                      }
+                    }}
+                  />
+                </Grid>
+
+                {/* END TIME EDITABLE */}
+                <Grid item xs={4}>
+                  <TimePicker
+                    label="End Time"
+                    value={form.endTime ? dayjs(`2024-01-01T${form.endTime}`) : null}
+                    onChange={(newValue) =>
+                      setForm({
+                        ...form,
+                        endTime: newValue?.format("HH:mm")
+                      })
+                    }
+                    sx={{
+                      "& .MuiInputBase-root": {
+                        background: "#1c1c1c",
+                        color: "#fff"
+                      }
+                    }}
+                  />
+                </Grid>
+
               </Grid>
-
-              {/* START TIME EDITABLE */}
-              <Grid item xs={4}>
-                <TextField
-                  fullWidth
-                  type="time"
-                  name="startTime"
-                  label="Start Time"
-                  InputLabelProps={{ shrink: true }}
-                  value={form.startTime}
-                  onChange={handleChange}
-                />
-              </Grid>
-
-              {/* END TIME EDITABLE */}
-              <Grid item xs={4}>
-                <TextField
-                  fullWidth
-                  type="time"
-                  name="endTime"
-                  label="End Time"
-                  InputLabelProps={{ shrink: true }}
-                  value={form.endTime}
-                  onChange={handleChange}
-                />
-              </Grid>
-
-            </Grid>
-
+            </LocalizationProvider>
           </div>
 
           <Box className="drawer-actions">
