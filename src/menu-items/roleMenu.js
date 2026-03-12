@@ -21,11 +21,11 @@ const RoleMenu = {
   title: 'Events',
   type: 'item',
   url: '/events',
-  icon: icons.IconCalendarEvent, // you can change icon
+  icon: icons.IconCalendarEvent, 
   breadcrumbs: false
 },
 {
-    id: 'ticket-management',
+    id: 'tickets',
     title: 'Ticket Management',
     type: 'item',
     url: '/tickets',
@@ -33,7 +33,7 @@ const RoleMenu = {
     breadcrumbs: false
   },
   {
-    id: 'view-bookings',
+    id: 'bookings',
     title: 'View Bookings',
     type: 'item',
     url: '/bookings',

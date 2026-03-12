@@ -79,7 +79,7 @@ const Order = () => {
 
               <TableHead>
                 <TableRow>
-                  <TableCell>#</TableCell>
+                  <TableCell>Sl No</TableCell>
                   <TableCell>Customer</TableCell>
                   <TableCell>Date</TableCell>
                   <TableCell>Event</TableCell>

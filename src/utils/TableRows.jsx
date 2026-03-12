@@ -145,18 +145,6 @@ const TableRows = ({
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
 
-                  {hasComment && (
-                    <Tooltip title="Reply">
-                      <IconButton
-                        onClick={() =>
-                          handleFormModal &&
-                          handleFormModal(row)
-                        }
-                      >
-                        <CommentIcon />
-                      </IconButton>
-                    </Tooltip>
-                  )}
 
                   {hasDelete && (
                     <Tooltip title="Delete">

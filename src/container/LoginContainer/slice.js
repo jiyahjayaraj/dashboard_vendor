@@ -71,8 +71,13 @@ const loginSlice = createSlice({
         },
         setProfileIncomplete: (state, action) => {
             state.profileIncomplete = action.payload;
+        },
+        logout: (state) => {
+            state.data = null;
+            state.userData = null;
+            state.profileIncomplete = false;
+            state.error = null;
         }
-
     }
 });
 
@@ -84,7 +89,8 @@ export const {
     userMeSuccess,
     userMeFail,
     setProfileIncomplete,
-    updateProfile
+    updateProfile,
+    logout
 
 } = loginSlice.actions;
 

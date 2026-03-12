@@ -15,7 +15,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import appConfig from "../../config";
 import commonApi from "../../container/api";
-import { setProfileIncomplete,userMe } from "../../container/LoginContainer/slice";
+import { setProfileIncomplete, userMe } from "../../container/LoginContainer/slice";
 
 const VendorProfileModal = () => {
 
@@ -35,13 +35,14 @@ const VendorProfileModal = () => {
         initialValues: {
             vendorName: user?.vendorName || "",
             vendorEmail: user?.vendorEmail || "",
-
             vendorMobile: user?.vendorMobile || "",
             companyName: user?.companyName || "",
             companyAddress: user?.companyAddress || "",
             city: user?.city || "",
             state: user?.state || "",
-            pincode: user?.pincode || ""
+            pincode: user?.pincode || "",
+            password: "",
+            confirmPassword: ""
         },
 
         enableReinitialize: true,
@@ -55,29 +56,44 @@ const VendorProfileModal = () => {
                 .required("Company name required"),
 
             companyAddress: Yup.string()
-                .required("Address required")
+                .required("Address required"),
+
+            password: Yup.string()
+                .min(6, "Password must be at least 6 characters"),
+
+            confirmPassword: Yup.string()
+                .oneOf([Yup.ref("password"), null], "Passwords must match")
 
         }),
 
-onSubmit: async (values) => {
-    try {
+        onSubmit: async (values) => {
 
-        const params = {
-            api: `${appConfig.ip}/api/updateProfile`,
-            method: "PUT",
-            body: values,
-            credentials: "include"   // cookies auto-sent
-        };
+            try {
 
-        await commonApi(params);
+                const payload = { ...values };
 
-        dispatch(userMe());
-        dispatch(setProfileIncomplete(false));
+                if (!payload.password) {
+                    delete payload.password;
+                    delete payload.confirmPassword;
+                }
 
-    } catch (err) {
-        console.log(err);
-    }
-}
+                const params = {
+                    api: `${appConfig.ip}/api/updateProfile`,
+                    method: "PUT",
+                    body: payload,
+                    credentials: "include"
+                };
+
+                await commonApi(params);
+
+                dispatch(userMe());
+                dispatch(setProfileIncomplete(false));
+
+            } catch (err) {
+                console.log(err);
+            }
+
+        }
 
     });
 
@@ -245,6 +261,32 @@ onSubmit: async (values) => {
                                 label="Pincode"
                                 name="pincode"
                                 value={formik.values.pincode}
+                                onChange={formik.handleChange}
+                            />
+
+                        </Grid>
+                        <Grid item xs={6}>
+
+                            <TextField
+                                fullWidth
+                                type="password"
+                                label="New Password"
+                                name="password"
+                                value={formik.values.password}
+                                onChange={formik.handleChange}
+                            />
+
+                        </Grid>
+
+
+                        <Grid item xs={6}>
+
+                            <TextField
+                                fullWidth
+                                type="password"
+                                label="Confirm Password"
+                                name="confirmPassword"
+                                value={formik.values.confirmPassword}
                                 onChange={formik.handleChange}
                             />
 

@@ -4,19 +4,22 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { userMe } from 'container/LoginContainer/slice';
 
-const AuthGuard = ({ children, user }) => {
+const AuthGuard = ({ children }) => {
   const dispatch = useDispatch();
+
+const checkUser = useSelector((state) =>state.login.userData)
   
-  const checkUser = true;
 
-  useEffect(() => {
-    dispatch(userMe());
-  }, [user]);
+  // useEffect(() => {
+  //   dispatch(userMe());
+  // }, [dispatch]);
 
-  if (!checkUser && user != null) {
-    return <Navigate to="/not-found" replace={true} />;
-  } else {
-  }
+
+  console.log("==checkuser",checkUser)
+
+if (!checkUser || Object.keys(checkUser).length === 0) {
+  return <Navigate to="/login" replace />;
+}
 
   return children;
 };

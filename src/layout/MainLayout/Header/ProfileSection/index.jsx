@@ -17,7 +17,7 @@ import Lottie from 'lottie-react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { IconSettings, IconLogout } from '@tabler/icons-react';
-// import UserProfileDrawer from 'ui-component/common/userProfile';
+import {logout} from '../../../../container/LoginContainer/slice';
 import doorCloseAnimation from 'assets/Gif/Door-Animation.json';
 // import ResetPasswordProfile from 'ui-component/common/userProfile/resetpassword';
 // import { setProfileFlag } from 'module/arbitrator/container/arbitratorProfile/slice';
@@ -33,17 +33,18 @@ const ResponsiveIcons = () => {
   const flag = useSelector((state) => state?.arbitratorReducer?.profileUpdate?.profileFlag);
   const name = useSelector((state) => state?.arbitratorReducer?.profileUpdate?.user?.data || {});
   const isDraftOrPending = name?.custom_status && name?.custom_status !== 'Approved';
+  
 
   const handleMenuClose = () => setAnchorEl(null);
   const handleLogoutClick = () => setLogoutOpen(true);
   const handleLogoutClose = () => setLogoutOpen(false);
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
 
-  const handleLogoutConfirm = () => {
-    localStorage.removeItem('Token');
-    setLogoutOpen(false);
-    navigate('/login');
-  };
+const handleLogoutConfirm = () => {
+  dispatch(logout());  
+  setLogoutOpen(false);
+  navigate('/login');
+};
 
   const profilescreenOpen = () => {
     // dispatch(setProfileFlag({ flag: true }));

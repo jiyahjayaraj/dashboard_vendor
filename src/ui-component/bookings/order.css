@@ -38,7 +38,7 @@
 /* TABLE */
 
 .order-table {
-  background: #1a1a1a;
+  background: #121821;
   border-radius: 8px;
   overflow-x: auto;
   box-shadow: 0 0 10px rgba(255, 122, 0, 0.1);
@@ -62,6 +62,7 @@
 }
 
 .order-table th {
+  background: #121821;
   font-weight: 600;
   color: #ff7a00;
 }

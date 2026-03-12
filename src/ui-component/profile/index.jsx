@@ -8,11 +8,18 @@ import {
   TextField,
   Divider,
   IconButton,
-  Typography
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from "@mui/material";
 
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import appConfig from '../../config';
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import InputAdornment from "@mui/material/InputAdornment";
 import { userMe, updateProfile } from "container/LoginContainer/slice";
 
 const Profile = () => {
@@ -30,7 +37,9 @@ const Profile = () => {
     companyAddress: "",
     city: "",
     state: "",
-    pincode: ""
+    pincode: "",
+    password: "",
+    confirmPassword: ""
   });
 
   const [avatar, setAvatar] = useState(null);
@@ -53,10 +62,10 @@ const Profile = () => {
     });
 
     setPreview(
-  vendor?.profileImage
-    ? `${appConfig.ip}/uploads/${vendor.profileImage}`
-    : ""
-);
+      vendor?.profileImage
+        ? `${appConfig.ip}/uploads/${vendor.profileImage}`
+        : ""
+    );
   }, [vendor]);
 
   const handleChange = (e) => {
@@ -77,10 +86,23 @@ const Profile = () => {
     }
   };
 
+  const [openPasswordModal, setOpenPasswordModal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const handleUpdate = () => {
+
+    if (formData.password && formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
     const data = new FormData();
 
     Object.keys(formData).forEach((key) => {
+      if (key === "password" && !formData.password) return; // skip empty password
+      if (key === "confirmPassword") return;
+
       data.append(key, formData[key]);
     });
 
@@ -249,13 +271,32 @@ const Profile = () => {
               value={formData.pincode}
               onChange={handleChange}
             />
+
           </Box>
         </Box>
 
         <Divider sx={{ borderColor: "#1e2633", my: 4 }} />
 
         {/* Update Button */}
-        <Box sx={{ textAlign: "right" }}>
+
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+
+          <Button
+            variant="outlined"
+            onClick={() => {
+              setShowPassword(false);
+              setShowConfirmPassword(false);
+              setOpenPasswordModal(true);
+            }}
+            sx={{
+              borderColor: "#fe7816",
+              color: "#fe7816",
+              "&:hover": { borderColor: "#ff8731" }
+            }}
+          >
+            Change Password
+          </Button>
+
           <Button
             variant="contained"
             onClick={handleUpdate}
@@ -270,7 +311,130 @@ const Profile = () => {
           >
             Update Profile
           </Button>
+
         </Box>
+
+        <Dialog
+          open={openPasswordModal}
+          onClose={() => setOpenPasswordModal(false)}
+          maxWidth="sm"
+          fullWidth
+          PaperProps={{
+            sx: {
+              background: "#111826",
+              color: "#fff",
+              borderRadius: 3,
+              p: 3
+            }
+          }}
+        >
+
+          <DialogTitle>Change Password</DialogTitle>
+
+          <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+
+            <TextField
+              label="New Password"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              fullWidth
+              sx={{
+                "& input::-ms-reveal": { display: "none" },
+                "& input::-ms-clear": { display: "none" }
+              }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(prev => !prev)}>
+                      {showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+            />
+
+            <TextField
+              label="Confirm Password"
+              type={showConfirmPassword ? "text" : "password"}
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              fullWidth
+              sx={{
+                "& input::-ms-reveal": { display: "none" },
+                "& input::-ms-clear": { display: "none" }
+              }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowConfirmPassword(prev => !prev)}>
+                      {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+            />
+
+          </DialogContent>
+
+          <DialogActions>
+            <Button
+              onClick={() => {
+                setOpenPasswordModal(false);
+                setShowPassword(false);
+                setShowConfirmPassword(false);
+
+                setFormData((prev) => ({
+                  ...prev,
+                  password: "",
+                  confirmPassword: ""
+                }));
+              }}
+              sx={{ color: "#aaa" }}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              onClick={() => {
+
+                if (!formData.password || !formData.confirmPassword) {
+                  alert("Please enter password");
+                  return;
+                }
+
+                if (formData.password !== formData.confirmPassword) {
+                  alert("Passwords do not match");
+                  return;
+                }
+
+                handleUpdate();
+                setOpenPasswordModal(false);
+
+                setShowPassword(false);
+                setShowConfirmPassword(false);
+
+                setFormData((prev) => ({
+                  ...prev,
+                  password: "",
+                  confirmPassword: ""
+                }));
+              }}
+              sx={{
+                background: "#fe7816",
+                color: "#fff",
+                "&:hover": { background: "#ff8731" }
+              }}
+              variant="contained"
+            >
+              Update Password
+            </Button>
+
+          </DialogActions>
+
+        </Dialog>
       </Paper>
     </Box>
   );
