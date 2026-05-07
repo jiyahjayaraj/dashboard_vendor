@@ -221,10 +221,12 @@ const Subscription = () => {
                   p: 3,
                   height: '100%',
                   borderRadius: 3,
-                  background: isCurrent
-                    ? '#5c5c5c'
-                    : '#000000',
-
+                 background: '#000000',
+border: isCurrent ? '2px solid #fe7816' : '1px solid #1f2937',
+boxShadow: isCurrent
+  ? '0 0 15px rgba(254,120,22,0.4)'
+  : 'none',
+position: 'relative',
                   color: '#fff'
                 }}
               >

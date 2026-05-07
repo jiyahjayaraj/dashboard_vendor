@@ -14,6 +14,7 @@ import {
   TextField,
   CircularProgress,
   MenuItem,
+  Stack,
 } from "@mui/material";
 import { Add, Edit } from "@mui/icons-material";
 import { useSelector } from "react-redux";
@@ -103,82 +104,102 @@ const TicketManagement = () => {
 
 
   return (
-    <Box sx={{ p: 4, backgroundColor: "#0b0f14", minHeight: "100vh" }}>
-      <Typography variant="h5" sx={{ color: "#fff", mb: 3 }}>
-        Ticket Management
-      </Typography>
-
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 2,
-          gap: 2,
-        }}
+    <Box p={3}>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
       >
+        <Box>
+          <Typography variant="h4" fontWeight="bold" fontSize={"20px"}>
+            Ticket Management
+          </Typography>
+          <Typography variant="body2" color="gray">
+            {filteredTickets?.length || 0} tickets found
+          </Typography>
+        </Box>
+
         <Button
+          variant="contained"
           startIcon={<Add />}
           onClick={handleCreate}
           sx={{
-            background: "linear-gradient(90deg, #fe7816, #ff9f1c)",
-            color: "#fff",
+            background: "linear-gradient(135deg,#f97316,#ea580c)",
+            borderRadius: "10px",
+            textTransform: "none",
+            fontWeight: "bold",
+            padding: "8px 18px",
+            fontSize: "13px",
+            boxShadow: "0 4px 14px rgba(249,115,22,0.35)"
           }}
         >
           Create New Ticket Type
         </Button>
+      </Stack>
 
-        <Box sx={{ display: "flex", gap: 2 }}>
-          {/* ✅ Event Filter */}
-          <TextField
-            select
-            size="small"
-            label="Filter by Event"
-            value={selectedEventId}
-            onChange={(e) => setSelectedEventId(e.target.value)}
-            sx={{
-              minWidth: 200,
-              backgroundColor: "#121821",
-              borderRadius: 1,
-              input: { color: "#fff" },
-            }}
-          >
-            {eventList.length > 0 ? (
-              eventList.map((event) => (
-                <MenuItem key={event._id} value={event._id}>
-                  {event.eventName}
-                </MenuItem>
-              ))
-            ) : (
-              <MenuItem disabled>No events</MenuItem>
-            )}
-          </TextField>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 2,
+          mb: 3,
+        }}
+      >
+        <TextField
+          select
+          label="Filter by Event"
+          value={selectedEventId}
+          onChange={(e) => setSelectedEventId(e.target.value)}
+          sx={{
+            maxWidth: 240,
+            fullWidth: true,
+            background: "#0b0b0b",
+            borderRadius: "8px"
+          }}
+        >
+          {eventList.length > 0 ? (
+            eventList.map((event) => (
+              <MenuItem key={event._id} value={event._id}>
+                {event.eventName}
+              </MenuItem>
+            ))
+          ) : (
+            <MenuItem disabled>No events</MenuItem>
+          )}
+        </TextField>
 
-          {/* Search */}
-          <TextField
-            size="small"
-            placeholder="Search..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            sx={{
-              input: { color: "#fff" },
-              backgroundColor: "#121821",
-              borderRadius: 1,
-            }}
-          />
-        </Box>
+        <TextField
+          placeholder="Search tickets..."
+          fullWidth
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          sx={{
+            maxWidth: 420,
+            background: "#0b0b0b",
+            borderRadius: "8px"
+          }}
+        />
       </Box>
-
-
 
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
           <CircularProgress />
         </Box>
       ) : (
-        <TableContainer component={Paper} sx={{ backgroundColor: "#121821" }}>
+        <TableContainer
+          component={Paper}
+          sx={{
+            borderRadius: "12px",
+            overflow: "hidden",
+            boxShadow: "0px 6px 18px rgba(0,0,0,0.08)"
+          }}
+        >
           <Table>
-            <TableHead>
+            <TableHead
+              sx={{
+                background: "#2b1a0f",
+              }}
+            >
               <TableRow>
                 {[
                   "Ticket Type",
@@ -189,69 +210,81 @@ const TicketManagement = () => {
                   "Status",
                   "Action",
                 ].map((h) => (
-                  <TableCell key={h} sx={{ color: "#9aa4b2" }}>
-                    {h}
+                  <TableCell key={h}>
+                    <b>{h}</b>
                   </TableCell>
                 ))}
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredTickets?.map((ticket) => (
-                <TableRow key={ticket._id}>
-                  <TableCell sx={{ color: "#fff" }}>
-                    {ticket.name}
-                  </TableCell>
-                  <TableCell sx={{ color: "#fff" }}>
-                    ₹ {ticket.price}
-                  </TableCell>
-                  <TableCell sx={{ color: "#fff" }}>
-                    {ticket.totalQuantity}
-                  </TableCell>
-                  <TableCell sx={{ color: "#fff" }}>
-                    {ticket.ticketsSold}
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={`$${(
-                        ticket.price * ticket.ticketsSold
-                      ).toLocaleString()}`}
-                      sx={{
-                        backgroundColor: "#0f5132",
-                        color: "#7fffd4",
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={ticket.status}
-                      color={
-                        ticket.status === "ACTIVE"
-                          ? "success"
-                          : "default"
-                      }
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      startIcon={<Edit />}
-                      size="small"
-                      onClick={() => handleEdit(ticket)}
-                    >
-                      Edit
-                    </Button>
-
-                    <Button
-                      startIcon={<Delete/>}
-                      size="small"
-                      color="error"
-                      onClick={() => handleDelete(ticket._id)}
-                    >
-                    Delete
-                    </Button>
+              {filteredTickets?.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    No Tickets Found
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                filteredTickets?.map((ticket) => (
+                  <TableRow key={ticket._id}>
+                    <TableCell>
+                      {ticket.name}
+                    </TableCell>
+                    <TableCell>
+                      ₹ {ticket.price}
+                    </TableCell>
+                    <TableCell>
+                      {ticket.totalQuantity}
+                    </TableCell>
+                    <TableCell>
+                      {ticket.ticketsSold}
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={`₹ ${(
+                          ticket.price * ticket.ticketsSold
+                        ).toLocaleString()}`}
+                        size="small"
+                        sx={{
+                          backgroundColor: "#0f5132",
+                          color: "#7fffd4",
+                          fontWeight: "bold"
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={ticket.status}
+                        color={
+                          ticket.status === "ACTIVE"
+                            ? "success"
+                            : "default"
+                        }
+                        size="small"
+                        sx={{ fontWeight: "bold" }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        startIcon={<Edit />}
+                        size="small"
+                        onClick={() => handleEdit(ticket)}
+                        sx={{ color: "#ff8c00" }}
+                      >
+                        Edit
+                      </Button>
+
+                      <Button
+                        startIcon={<Delete />}
+                        size="small"
+                        color="error"
+                        onClick={() => handleDelete(ticket._id)}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>
@@ -265,8 +298,6 @@ const TicketManagement = () => {
         }}
         ticketData={selectedTicket}
       />
-
-
     </Box>
   );
 };

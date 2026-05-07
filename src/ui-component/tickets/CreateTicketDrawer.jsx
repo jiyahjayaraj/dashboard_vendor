@@ -80,12 +80,27 @@ const CreateTicketDrawer = ({ open, onClose, ticketData }) => {
             dispatch(getEventsRequest({ vendorId }));
         }
     }, [dispatch, open, vendorId]);
+const toTitleCase = (text) => {
+  if (!text) return text;
 
+  return text
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
 
-    const handleChange = (e) => {
-        console.log("changing:", e.target.name, e.target.value);
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
+   const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    const formattedValue =
+        name === "name" ? toTitleCase(value) : value;
+
+    setForm({
+        ...form,
+        [name]: formattedValue,
+    });
+};
 
     const handleSubmit = () => {
         if (!form.eventId) {

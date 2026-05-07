@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Grid, Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { Grid, Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Stack, Avatar } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -94,7 +94,7 @@ const AnalyticsCard = () => {
           <Link to="/events" style={{ textDecoration: "none", color: "inherit" }}>
             <Card
               title="Active Events"
-              count={activeEvents}
+              count={totalEvents}
               color="#d0d7e4"
               bgTheme="#000000"
               icon={<ClockCircleOutlined />}
@@ -118,63 +118,62 @@ const AnalyticsCard = () => {
 
       {/* ===== RECENT BOOKINGS TABLE ===== */}
       <Box sx={{ mt: 4 }}>
-
-        <Typography variant="h6" sx={{ mb: 2 }}>
+        <Typography variant="h4" fontWeight="bold" fontSize={"20px"} mb={3}>
           Recent Bookings
         </Typography>
 
-        <Paper elevation={0} sx={{ borderRadius: 2 }}>
-          <TableContainer>
-            <Table>
+        <TableContainer
+          component={Paper}
+          sx={{
+            borderRadius: "12px",
+            overflow: "hidden",
+            boxShadow: "0px 6px 18px rgba(0,0,0,0.08)"
+          }}
+        >
+          <Table>
+            <TableHead
+              sx={{
+                background: "#2b1a0f",
+              }}
+            >
+              <TableRow>
+                <TableCell><b>#</b></TableCell>
+                <TableCell><b>Customer</b></TableCell>
+                <TableCell><b>Date</b></TableCell>
+                <TableCell><b>Event</b></TableCell>
+                <TableCell><b>Amount</b></TableCell>
+              </TableRow>
+            </TableHead>
 
-              <TableHead>
-                <TableRow>
-                  <TableCell>#</TableCell>
-                  <TableCell>Customer</TableCell>
-                  <TableCell>Date</TableCell>
-                  <TableCell>Event</TableCell>
-                  <TableCell>Amount</TableCell>
-                </TableRow>
-              </TableHead>
-
-              <TableBody>
-                {recentOrders.length > 0 ? (
-                  recentOrders.map((order, index) => (
-                    <TableRow key={order._id} hover>
-
-                      <TableCell>{index + 1}</TableCell>
-
-                      <TableCell>
-                        {order.userId?.name || "Unknown"}
-                      </TableCell>
-
-                      <TableCell>
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </TableCell>
-
-                      <TableCell>
-                        {order.eventId?.eventName}
-                      </TableCell>
-
-                      <TableCell>
-                        ₹ {order.totalAmount}
-                      </TableCell>
-
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={5} align="center">
-                      No Recent Bookings
+            <TableBody>
+              {recentOrders.length > 0 ? (
+                recentOrders.map((order, index) => (
+                  <TableRow key={order._id} hover>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>
+                      {order.userId?.name || "Unknown"}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      {order.eventId?.eventName}
+                    </TableCell>
+                    <TableCell>
+                      ₹ {order.totalAmount}
                     </TableCell>
                   </TableRow>
-                )}
-              </TableBody>
-
-            </Table>
-          </TableContainer>
-        </Paper>
-
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} align="center">
+                    No Recent Bookings
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Box>
 
     </Box>

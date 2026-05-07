@@ -14,8 +14,12 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  CircularProgress
+  CircularProgress,
+  Stack,
+  Avatar,
+  InputAdornment
 } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 
 const Order = () => {
   const dispatch = useDispatch();
@@ -38,35 +42,56 @@ const Order = () => {
   });
 
   return (
-    <Box className="order-container">
+    <Box p={3} className="order-container">
+      {/* HEADER */}
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
+        <Box>
+          <Typography variant="h4" fontWeight="bold" fontSize={"20px"}>
+            Orders
+          </Typography>
+          <Typography variant="body2" color="gray">
+            {orders?.length || 0} orders found
+          </Typography>
+        </Box>
+      </Stack>
 
-      {/* Header */}
-      <Box className="order-header">
-        <Typography variant="h5">
-          Orders
-        </Typography>
+      {/* SEARCH */}
+      <TextField
+        placeholder="Search by customer..."
+        fullWidth
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        sx={{
+          mb: 3,
+          maxWidth: 420,
+          background: "#0b0b0b",
+          borderRadius: "8px"
+        }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon />
+            </InputAdornment>
+          )
+        }}
+      />
 
-        <Typography variant="body2">
-          Manage and track customer bookings
-        </Typography>
-      </Box>
-
-      {/* Search */}
-      <Box className="order-controls">
-        <TextField
-          size="small"
-          placeholder="Search by customer..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          variant="outlined"
-        />
-      </Box>
-
-      {/* Table */}
-      <Paper className="order-table" elevation={0}>
-
+      {/* TABLE */}
+      <TableContainer
+        component={Paper}
+        sx={{
+          borderRadius: "12px",
+          overflow: "hidden",
+          boxShadow: "0px 6px 18px rgba(0,0,0,0.08)"
+        }}
+      >
         {loading ? (
-          <Box sx={{ padding: "20px", textAlign: "center" }}>
+          <Box sx={{ padding: "40px", textAlign: "center" }}>
             <CircularProgress />
           </Box>
         ) : error ? (
@@ -74,58 +99,65 @@ const Order = () => {
             Failed to load orders
           </Typography>
         ) : (
-          <TableContainer>
-            <Table>
+          <Table>
+            <TableHead
+              sx={{
+                background: "#2b1a0f",
+              }}
+            >
+              <TableRow>
+                <TableCell><b>#</b></TableCell>
+                <TableCell><b>Customer</b></TableCell>
+                <TableCell><b>Date</b></TableCell>
+                <TableCell><b>Event</b></TableCell>
+                <TableCell><b>Amount</b></TableCell>
+              </TableRow>
+            </TableHead>
 
-              <TableHead>
-                <TableRow>
-                  <TableCell>Sl No</TableCell>
-                  <TableCell>Customer</TableCell>
-                  <TableCell>Date</TableCell>
-                  <TableCell>Event</TableCell>
-                  <TableCell>Amount</TableCell>
-                </TableRow>
-              </TableHead>
-
-              <TableBody>
-                {filteredOrders.length > 0 ? (
-                  filteredOrders.map((order, index) => (
-                    <TableRow key={order._id} hover>
-
-                      <TableCell>{index + 1}</TableCell>
-
-                      <TableCell>
-                        {order.userId?.name || "Unknown"}
-                      </TableCell>
-
-                      <TableCell>
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </TableCell>
-
-                      <TableCell>
-                        {order.eventId?.eventName}
-                      </TableCell>
-
-                      <TableCell>
-                        ₹ {order.totalAmount}
-                      </TableCell>
-
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={5} align="center">
-                      No Orders Found
+            <TableBody>
+              {filteredOrders.length > 0 ? (
+                filteredOrders.map((order, index) => (
+                  <TableRow key={order._id} hover>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <Avatar
+                          sx={{
+                            bgcolor: "#fe7816",
+                            width: 36,
+                            height: 36,
+                            color: "white",
+                          }}
+                        >
+                          {order.userId?.name?.charAt(0).toUpperCase() || "C"}
+                        </Avatar>
+                        <Typography fontWeight="500">
+                          {order.userId?.name || "Unknown"}
+                        </Typography>
+                      </Stack>
+                    </TableCell>
+                    <TableCell>
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      {order.eventId?.eventName}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 500 }}>
+                      ₹ {order.totalAmount}
                     </TableCell>
                   </TableRow>
-                )}
-              </TableBody>
-
-            </Table>
-          </TableContainer>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} align="center">
+                    No Orders Found
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         )}
-      </Paper>
-
+      </TableContainer>
     </Box>
   );
 };

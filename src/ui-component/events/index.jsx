@@ -1,5 +1,41 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+
+// Fix default leaflet icon issue in Vite/Webpack
+const customIcon = new L.Icon({
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+// Component to handle map clicks for Leaflet
+function LocationMarker({ position, setPosition }) {
+  useMapEvents({
+    click(e) {
+      setPosition(e.latlng.lat, e.latlng.lng);
+    }
+  });
+
+  return position ? <Marker position={position} icon={customIcon} /> : null;
+}
+
+// Component to dynamically recenter map when coordinates change programmatically
+function RecenterMap({ lat, lng }) {
+  const map = useMap();
+  useEffect(() => {
+    if (lat && lng) {
+      map.flyTo([Number(lat), Number(lng)], 14, { duration: 1.5 });
+    }
+  }, [lat, lng, map]);
+  return null;
+}
 import { useNavigate } from "react-router-dom";
 import { getSubscription } from "container/subscription/slice";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -34,6 +70,7 @@ import {
 import "./events.css";
 
 export default function Events() {
+
   const subscription = useSelector((state) => state.subscription?.data);
   const [eventTypes, setEventTypes] = useState([]);
   const dispatch = useDispatch();
@@ -59,6 +96,8 @@ export default function Events() {
     eventType: "",
     city: "",
     eventLocation: "",
+    latitude: "",
+    longitude: "",
     eventDate: "",
     startTime: "",
     endTime: "",
@@ -68,6 +107,51 @@ export default function Events() {
     earlyDeadline: "",
     bannerImage: null
   });
+
+  const lastSearchedRef = useRef("");
+
+  // Auto-geocode based on City and Event Location
+  useEffect(() => {
+    const fetchCoordinates = async () => {
+      // Must have at least the city filled out to geocode
+      if (!form.city || isEdit) return;
+
+      // Primary query: Venue + City + India
+      const query = `${form.eventLocation ? form.eventLocation + ' ' : ''}${form.city} India`.trim();
+
+      // Don't search if query is unchanged
+      if (query === lastSearchedRef.current) return;
+
+      lastSearchedRef.current = query;
+
+      try {
+        let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+        let data = await res.json();
+
+        // If specific venue + city yields no results, safely fallback to just the city!
+        if (!data || data.length === 0) {
+          const fallbackQuery = `${form.city} India`.trim();
+          res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fallbackQuery)}`);
+          data = await res.json();
+        }
+
+        if (data && data.length > 0) {
+          const { lat, lon } = data[0];
+          setForm((prev) => ({
+            ...prev,
+            latitude: lat,
+            longitude: lon
+          }));
+        }
+      } catch (error) {
+        console.error("Geocoding failed:", error);
+      }
+    };
+
+    // Debounce of about 1200ms to avoid spamming the API
+    const debounceTimer = setTimeout(fetchCoordinates, 1200);
+    return () => clearTimeout(debounceTimer);
+  }, [form.city, form.eventLocation, isEdit]);
 
   useEffect(() => {
     fetch("http://localhost:5000/api/eventtypes")
@@ -113,6 +197,8 @@ export default function Events() {
       eventType: "",
       city: "",
       eventLocation: "",
+      latitude: "",
+      longitude: "",
       eventDate: "",
       startTime: "",
       endTime: "",
@@ -264,6 +350,8 @@ export default function Events() {
                   onClick={() => {
                     setForm({
                       ...e,
+                      latitude: e.location?.coordinates?.[1] || "",
+                      longitude: e.location?.coordinates?.[0] || "",
                       eventType: e.eventType || "",
                       eventDate: e.eventDate
                         ? new Date(e.eventDate).toISOString().split("T")[0]
@@ -403,6 +491,43 @@ export default function Events() {
                 />
               </Grid>
 
+              <Grid item xs={12}>
+                <Box sx={{ height: 300, width: "100%", borderRadius: 2, overflow: "hidden", mb: 1 }}>
+                  <MapContainer
+                    center={[
+                      form.latitude ? Number(form.latitude) : 9.9312,
+                      form.longitude ? Number(form.longitude) : 76.2673
+                    ]}
+                    zoom={12}
+                    style={{ height: "100%", width: "100%" }}
+                  >
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    <RecenterMap lat={form.latitude} lng={form.longitude} />
+                    <LocationMarker
+                      position={
+                        form.latitude && form.longitude
+                          ? [Number(form.latitude), Number(form.longitude)]
+                          : null
+                      }
+                      setPosition={(lat, lng) => setForm({ ...form, latitude: lat, longitude: lng })}
+                    />
+                  </MapContainer>
+                </Box>
+
+                {(form.latitude && form.longitude) ? (
+                  <Typography sx={{ mt: 1 }} color="text.secondary" variant="body2">
+                    Selected Coordinates: {form.latitude}, {form.longitude}
+                  </Typography>
+                ) : (
+                  <Typography sx={{ mt: 1 }} color="text.secondary" variant="body2">
+                    Click on the map to select coordinates
+                  </Typography>
+                )}
+              </Grid>
+
             </Grid>
 
           </div>
@@ -515,7 +640,7 @@ export default function Events() {
             <Button
               variant="contained"
               onClick={handleSubmit}
-              disabled={!vendorId || !form.eventName}
+              disabled={!vendorId || !form.eventName || !form.latitude || !form.longitude}
             >
               {isEdit ? "Update Event" : "Create Event"}
             </Button>

@@ -29,7 +29,7 @@ const loginSlice = createSlice({
             state.loading = false;
             state.error = {
                 message: action.payload.message || 'Login failed',
-                status: action.payload.status || 5000
+                status: action.payload.status || 500
             };
         },
 
@@ -41,6 +41,7 @@ const loginSlice = createSlice({
         userMeSuccess: (state, action) => {
             state.loading = false;
             state.userData = action.payload;
+            state.isInitialized = true;
             state.error = null;
 
             const vendor = action.payload;
@@ -58,25 +59,36 @@ const loginSlice = createSlice({
 
         userMeFail: (state) => {
             state.loading = false;
+            state.userData = null;
+            state.isInitialized = true;
         },
         updateProfile: (state) => {
             state.loading = true;
         },
-        updateProfileSuccess: (state) => {
+        updateProfileSuccess: (state, action) => {
             state.loading = false;
+
+            state.userData = {
+                ...state.userData,
+                ...action.payload
+            };
         },
         updateProfileFail: (state, action) => {
             state.loading = false;
-            state.error = action.payload;
         },
         setProfileIncomplete: (state, action) => {
             state.profileIncomplete = action.payload;
         },
+        logoutRequest: (state) => {
+            state.loading = true;
+        },
         logout: (state) => {
             state.data = null;
             state.userData = null;
+            state.isInitialized = false;
             state.profileIncomplete = false;
             state.error = null;
+            state.loading = false;
         }
     }
 });
@@ -90,8 +102,8 @@ export const {
     userMeFail,
     setProfileIncomplete,
     updateProfile,
+    logoutRequest,
     logout
-
 } = loginSlice.actions;
 
 export const selectError = (state) => state.login.error;

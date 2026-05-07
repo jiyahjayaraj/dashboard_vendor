@@ -67,15 +67,36 @@ const Profile = () => {
         : ""
     );
   }, [vendor]);
+  const capitalizeFirstLetter = (value) => {
+  if (!value) return value;
+  return value.charAt(0).toUpperCase() + value.slice(1);
+};
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+const handleChange = (e) => {
+  const { name, value } = e.target;
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  let updatedValue = value;
+
+  // Apply capitalization only for specific fields
+  if (
+    name === "vendorName" ||
+    name === "companyName" ||
+    name === "city" ||
+    name === "state"||
+    name === "companyAddress"
+  ) {
+    updatedValue = capitalizeFirstLetter(value);
+  }
+    // Mobile: allow only numbers (no limit here)
+  if (name === "vendorMobile") {
+    updatedValue = value.replace(/\D/g, "");
+  }
+
+  setFormData((prev) => ({
+    ...prev,
+    [name]: updatedValue
+  }));
+};
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -91,6 +112,10 @@ const Profile = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleUpdate = () => {
+ if (!/^\d{10}$/.test(formData.vendorMobile)) {
+  alert("Mobile number must be exactly 10 digits");
+  return;
+}
 
     if (formData.password && formData.password !== formData.confirmPassword) {
       alert("Passwords do not match");

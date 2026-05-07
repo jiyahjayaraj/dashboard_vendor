@@ -17,7 +17,7 @@ import Lottie from 'lottie-react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { IconSettings, IconLogout } from '@tabler/icons-react';
-import {logout} from '../../../../container/LoginContainer/slice';
+import {logoutRequest} from '../../../../container/LoginContainer/slice';
 import doorCloseAnimation from 'assets/Gif/Door-Animation.json';
 // import ResetPasswordProfile from 'ui-component/common/userProfile/resetpassword';
 // import { setProfileFlag } from 'module/arbitrator/container/arbitratorProfile/slice';
@@ -41,11 +41,10 @@ const ResponsiveIcons = () => {
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
 
 const handleLogoutConfirm = () => {
-  dispatch(logout());  
-  setLogoutOpen(false);
-  navigate('/login');
-};
+  dispatch(logoutRequest({ navigate }));
 
+  setLogoutOpen(false);
+};
   const profilescreenOpen = () => {
     // dispatch(setProfileFlag({ flag: true }));
   };
